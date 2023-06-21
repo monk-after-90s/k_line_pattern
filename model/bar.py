@@ -43,3 +43,20 @@ class DbBarData(Model):
     class Meta:
         database: peewee_async.MySQLDatabase = db
         indexes: tuple = ((("symbol", "exchange", "interval", "datetime"), True),)
+
+
+class DbBarOverview(Model):
+    """K线汇总数据表映射对象"""
+
+    id: AutoField = AutoField()
+
+    symbol: str = CharField()
+    exchange: str = CharField()
+    interval: str = CharField()
+    count: int = IntegerField()
+    start: datetime = DateTimeField()
+    end: datetime = DateTimeField()
+
+    class Meta:
+        database: peewee_async.MySQLDatabase = db
+        indexes: tuple = ((("symbol", "exchange", "interval"), True),)
