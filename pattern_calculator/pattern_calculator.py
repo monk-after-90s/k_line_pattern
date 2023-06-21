@@ -12,8 +12,9 @@ class PatternCalcltor:
     bar_num: int = 0
 
     def __init__(self, bars: Iterable[DbBarData]):
-        # 转换为pandas对象
-        self.bar_df = pd.DataFrame(sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime']))
+        # 转换为pandas Dataframe对象
+        self.bar_df = pd.DataFrame(
+            sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
         # calculator function
         self.cal_func: Callable | None = None
 
@@ -29,4 +30,4 @@ class CSFRCalcltor(PatternCalcltor):
         self.cal_func: Callable = CSFR
 
     def __call__(self):
-        return self.cal_func(self.bar_df[-self.bar_num:])
+        return self.cal_func(self.bar_df)
