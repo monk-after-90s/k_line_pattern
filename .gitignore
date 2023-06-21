@@ -13,6 +13,6 @@
 dist
 build
 venv*
-pattern_recognition
+cal_pattern
 config_k_line.ipynb
 config.py
