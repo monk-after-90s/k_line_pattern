@@ -16,3 +16,4 @@ venv*
 cal_pattern
 config_k_line.ipynb
 config.py
+test*.py
