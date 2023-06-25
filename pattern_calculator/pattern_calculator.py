@@ -31,3 +31,14 @@ class CSFRCalcltor(PatternCalcltor):
 
     def __call__(self):
         return self.cal_func(self.bar_df)
+
+
+class FindDuckHeadCalcltor(PatternCalcltor):
+    bar_num = 105
+
+    def __init__(self, bars: Iterable[DbBarData]):
+        super().__init__(bars)
+        self.cal_func: Callable = find_duck_head
+
+    def __call__(self):
+        return self.cal_func(self.bar_df)
