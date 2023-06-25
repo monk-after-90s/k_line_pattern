@@ -76,3 +76,14 @@ class WYGDCalcltor(PatternCalcltor):
 
     def __call__(self):
         return self.cal_func(self.bar_df)
+
+
+class DTZDCalcltor(PatternCalcltor):
+    bar_num = 2
+
+    def __init__(self, bars: Iterable[DbBarData]):
+        super().__init__(bars)
+        self.cal_func: Callable = DTZD
+
+    def __call__(self):
+        return self.cal_func(self.bar_df)
