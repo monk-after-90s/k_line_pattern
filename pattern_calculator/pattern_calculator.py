@@ -65,3 +65,14 @@ class ThreeWavesUpCalcltor(PatternCalcltor):
 
     def __call__(self):
         return self.cal_func(self.bar_df)
+
+
+class WYGDCalcltor(PatternCalcltor):
+    bar_num = 2
+
+    def __init__(self, bars: Iterable[DbBarData]):
+        super().__init__(bars)
+        self.cal_func: Callable = WYGD
+
+    def __call__(self):
+        return self.cal_func(self.bar_df)
