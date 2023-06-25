@@ -87,3 +87,25 @@ class DTZDCalcltor(PatternCalcltor):
 
     def __call__(self):
         return self.cal_func(self.bar_df)
+
+
+class ThreeWavesDownCalcltor(PatternCalcltor):
+    _instance_lock = threading.Lock()
+
+    bar_num = 1  # todo 可以处理历史数据
+
+    def __init__(self, bars: Iterable[DbBarData]):
+        super().__init__(bars)
+        self._three_waves_down_ins = ThreeWavesDown()
+        self.cal_func: Callable = self._three_waves_down_ins.update_bar
+
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, '_instance'):
+            with ThreeWavesDownCalcltor._instance_lock:
+                if not hasattr(cls, '_instance'):
+                    ThreeWavesDownCalcltor._instance = super().__new__(cls)
+
+        return ThreeWavesDownCalcltor._instance
+
+    def __call__(self):
+        return self.cal_func(self.bar_df)
