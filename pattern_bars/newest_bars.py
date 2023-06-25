@@ -1,17 +1,21 @@
 import asyncio
-from typing import Iterable
-from config import INTERVALS
+from typing import Iterable, List
 from model import get_or_create_bar_objects, DbBarData, DbBarOverview
 from pattern_calculator import pattern_calcltor_calsses
 
 
-async def query_newest_bars():
-    """获取全部symbol配置计算形态所需要的bars数据"""
+async def query_newest_bars(intervals: List):
+    """
+    获取全部symbol配置计算形态所需要的bars数据
+
+    :param intervals: K线间隔筛选
+    :return:
+    """
     # 获取symbol配置，分配任务
     bar_objects = await get_or_create_bar_objects()
     # 获取symbol配置
     bar_configs: Iterable[DbBarOverview] = await bar_objects.execute(
-        DbBarOverview.select().where(DbBarOverview.interval.in_(INTERVALS)))
+        DbBarOverview.select().where(DbBarOverview.interval.in_(intervals)))
     return await asyncio.gather(
         *(_query_newest_bars(bar_config.symbol, bar_config.exchange, bar_config.interval) for bar_config in
           bar_configs))
