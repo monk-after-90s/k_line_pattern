@@ -1,4 +1,5 @@
 """形态计算器"""
+import threading
 from typing import Callable, Iterable
 from playhouse.shortcuts import model_to_dict
 from model import DbBarData
@@ -39,6 +40,28 @@ class FindDuckHeadCalcltor(PatternCalcltor):
     def __init__(self, bars: Iterable[DbBarData]):
         super().__init__(bars)
         self.cal_func: Callable = find_duck_head
+
+    def __call__(self):
+        return self.cal_func(self.bar_df)
+
+
+class ThreeWavesUpCalcltor(PatternCalcltor):
+    _instance_lock = threading.Lock()
+
+    bar_num = 1  # todo 可以处理历史数据
+
+    def __init__(self, bars: Iterable[DbBarData]):
+        super().__init__(bars)
+        self._three_waves_up_ins = ThreeWavesUp()
+        self.cal_func: Callable = self._three_waves_up_ins.update_bar
+
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, '_instance'):
+            with ThreeWavesUpCalcltor._instance_lock:
+                if not hasattr(cls, '_instance'):
+                    ThreeWavesUpCalcltor._instance = super().__new__(cls)
+
+        return ThreeWavesUpCalcltor._instance
 
     def __call__(self):
         return self.cal_func(self.bar_df)
