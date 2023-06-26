@@ -1,5 +1,4 @@
 """形态计算器"""
-import threading
 from typing import Callable, Iterable
 from playhouse.shortcuts import model_to_dict
 from model import DbBarData
