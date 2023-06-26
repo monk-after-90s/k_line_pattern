@@ -4,9 +4,7 @@ from typing import List, Callable
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from config import INTERVALS
-
-# INTERVALS到秒数的转换
-interval_secs_map = {"d": 86_400, "4h": 14_400, "1h": 3_600, "30m": 1_800}
+from utilities import INTERVAL_SECS_MAP as interval_secs_map
 
 schedule_interval = float('inf')
 
