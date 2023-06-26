@@ -73,6 +73,11 @@ class XiangTiZhengLiCalcltor(PatternCalcltor):
         return XiangTiZhengLi(bar_df, intervals[0]).analyse_pattern
 
 
+class JDFJCalcltor(PatternCalcltor):
+    bar_num = 5
+    cal_func: Callable = JDFJ
+
+
 class SJZXCalcltor(PatternCalcltor):
     bar_num = 5
     cal_func: Callable = SJZX
