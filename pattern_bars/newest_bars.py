@@ -22,7 +22,11 @@ async def query_newest_bars(intervals: List):
 
 
 async def _query_newest_bars(symbol: str, exchange: str, interval: str):
-    """扫描一个K线序列"""
+    """
+    扫描一个K线序列
+
+    :return: 按datetime排序的K线列表
+    """
     # 需要的最大的Kline Bar数量
     max_bar_num: int = max(pattern_calcltor_calss.bar_num for pattern_calcltor_calss in pattern_calcltor_calsses)
     bar_objects = await get_or_create_bar_objects()
