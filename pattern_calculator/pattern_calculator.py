@@ -78,6 +78,11 @@ class JDFJCalcltor(PatternCalcltor):
     cal_func: Callable = JDFJ
 
 
+class JZTDCalcltor(PatternCalcltor):
+    bar_num = 5
+    cal_func: Callable = JZTD
+
+
 class SJZXCalcltor(PatternCalcltor):
     bar_num = 5
     cal_func: Callable = SJZX
