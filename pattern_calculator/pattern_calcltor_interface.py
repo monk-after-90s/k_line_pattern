@@ -6,6 +6,8 @@ import pandas as pd
 
 
 class PatternCalcltor(ABC):
+    # 名字
+    name = ''
     # K line number
     bar_num: int = 0
     cal_func: Callable = None
