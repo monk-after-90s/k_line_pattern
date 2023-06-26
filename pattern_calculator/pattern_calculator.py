@@ -99,3 +99,17 @@ class FindMUpperCalcltor(PatternCalcltor):
             sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
 
         return find_m_upper(bar_df, intervals[0])
+
+
+class FindHeadAndShoulders(PatternCalcltor):
+    bar_num = 150
+
+    def calculate(self, bars: Iterable[DbBarData]):
+        # K线间隔限定
+        intervals = [bar.interval for bar in bars]
+        assert len(intervals) == 1
+        # bar Dataframe
+        bar_df = pd.DataFrame(
+            sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
+
+        return find_head_and_shoulders(bar_df, intervals[0])
