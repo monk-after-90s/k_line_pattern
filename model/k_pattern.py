@@ -49,8 +49,8 @@ class KPattern(BaseModel):
 
 class PatternMatchRecord(BaseModel):
     pattern_id = IntegerField(column_name='patternId')
-    symbol = CharField()
-    k_interval = CharField(column_name='kInterval')
+    symbol = CharField()  # 市场符号，如BTC/USDT
+    k_interval = CharField(column_name='kInterval')  # K线Interval，如1d，4h，币安标准
     match_degree = FloatField(column_name='matchDegree')
     pattern_end = DateTimeField(column_name='patternEnd', constraints=[SQL("DEFAULT CURRENT_TIMESTAMP")])
     pattern_start = DateTimeField(column_name='patternStart', constraints=[SQL("DEFAULT CURRENT_TIMESTAMP")])
