@@ -65,7 +65,6 @@ class XiangTiZhengLiCalcltor(PatternCalcltor):
         # K线间隔限定
         intervals = [bar.interval for bar in bars]
         assert len(intervals) == 1
-        assert intervals[0] in ['30m', '1h', '4h', 'd']
         # bar Dataframe
         bar_df = pd.DataFrame(
             sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
@@ -95,7 +94,6 @@ class FindMUpperCalcltor(PatternCalcltor):
         # K线间隔限定
         intervals = [bar.interval for bar in bars]
         assert len(intervals) == 1
-        assert intervals[0] in ['30m', '1h', '4h', 'd']
         # bar Dataframe
         bar_df = pd.DataFrame(
             sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
