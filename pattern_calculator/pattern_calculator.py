@@ -100,6 +100,6 @@ class FindMUpperCalcltor(PatternCalcltorWithInterval):
     cal_func: Callable = find_m_upper
 
 
-class FindHeadAndShoulders(PatternCalcltorWithInterval):
+class FindHeadAndShouldersCalcltor(PatternCalcltorWithInterval):
     bar_num = 150
     cal_func: Callable = find_head_and_shoulders
