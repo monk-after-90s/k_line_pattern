@@ -86,3 +86,18 @@ class JZTDCalcltor(PatternCalcltor):
 class SJZXCalcltor(PatternCalcltor):
     bar_num = 5
     cal_func: Callable = SJZX
+
+
+class FindMUpperCalcltor(PatternCalcltor):
+    bar_num = 100
+
+    def calculate(self, bars: Iterable[DbBarData]):
+        # K线间隔限定
+        intervals = [bar.interval for bar in bars]
+        assert len(intervals) == 1
+        assert intervals[0] in ['30m', '1h', '4h', 'd']
+        # bar Dataframe
+        bar_df = pd.DataFrame(
+            sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
+
+        return find_m_upper(bar_df, intervals[0])
