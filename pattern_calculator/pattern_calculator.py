@@ -56,3 +56,18 @@ class ThreeWavesDownCalcltor(PatternCalcltor):
 
     bar_num = 1  # todo 可以处理历史数据
     cal_func: Callable = _three_waves_down_ins.update_bar
+
+
+class XiangTiZhengLiCalcltor(PatternCalcltor):
+    bar_num = 35  # todo 可以处理历史数据
+
+    def calculate(self, bars: Iterable[DbBarData]):
+        # K线间隔限定
+        intervals = [bar.interval for bar in bars]
+        assert len(intervals) == 1
+        assert intervals[0] in ['30m', '1h', '4h', 'd']
+        # bar Dataframe
+        bar_df = pd.DataFrame(
+            sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
+
+        return XiangTiZhengLi(bar_df, intervals[0]).analyse_pattern
