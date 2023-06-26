@@ -29,4 +29,5 @@ async def _query_newest_bars(symbol: str, exchange: str, interval: str):
     bars: Iterable[DbBarData] = await bar_objects.execute(DbBarData.select().where(
         (DbBarData.symbol == symbol) & (DbBarData.exchange == exchange) & (DbBarData.interval == interval)). \
                                                           order_by(DbBarData.datetime.desc()).limit(max_bar_num))
+    bars = sorted(bars, key=lambda item: item.datetime)
     return bars
