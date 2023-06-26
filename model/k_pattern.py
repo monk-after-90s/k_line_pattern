@@ -3,6 +3,7 @@ import asyncio
 import peewee_async
 from peewee import *
 import config
+from playhouse.mysql_ext import JSONField
 
 db = peewee_async.MySQLDatabase(database=config.DB,
                                 user=config.DB_USER,
@@ -53,6 +54,7 @@ class PatternMatchRecord(BaseModel):
     match_degree = FloatField(column_name='matchDegree')
     pattern_end = DateTimeField(column_name='patternEnd', constraints=[SQL("DEFAULT CURRENT_TIMESTAMP")])
     pattern_start = DateTimeField(column_name='patternStart', constraints=[SQL("DEFAULT CURRENT_TIMESTAMP")])
+    extra = JSONField(null=True)  # json
 
     class Meta:
         table_name = 'pattern_match_record'
