@@ -108,3 +108,8 @@ class FindHeadAndShouldersCalcltor(PatternCalcltorWithInterval):
 class FindWBottomCalcltor(PatternCalcltorWithInterval):
     bar_num = 100
     cal_func: Callable = find_w_bottom
+
+
+class FindHeadAndShouldersBottomCalcltor(PatternCalcltorWithInterval):
+    bar_num = 150
+    cal_func: Callable = find_head_and_shoulders_bottom
