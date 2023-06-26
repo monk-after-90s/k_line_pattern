@@ -71,3 +71,8 @@ class XiangTiZhengLiCalcltor(PatternCalcltor):
             sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
 
         return XiangTiZhengLi(bar_df, intervals[0]).analyse_pattern
+
+
+class SJZXCalcltor(PatternCalcltor):
+    bar_num = 5
+    cal_func: Callable = SJZX
