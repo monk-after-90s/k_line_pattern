@@ -5,6 +5,7 @@ from model import DbBarData
 from abc import ABC
 from cal_pattern import *
 import pandas as pd
+from pandas import DataFrame
 
 
 class PatternCalcltor(ABC):
@@ -22,6 +23,20 @@ class PatternCalcltor(ABC):
         bar_df = pd.DataFrame(
             sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
         return self.cal_func(bar_df)
+
+
+class PatternCalcltorWithInterval(ABC, PatternCalcltor):
+    """带有interval参数的形态计算器"""
+
+    def calculate(self, bars: Iterable[DbBarData]):
+        # K线间隔
+        intervals = [bar.interval for bar in bars]
+        assert len(intervals) == 1
+        # bar Dataframe
+        bar_df = pd.DataFrame(
+            sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
+
+        return self.cal_func(bar_df, intervals[0])
 
 
 class CSFRCalcltor(PatternCalcltor):
@@ -58,18 +73,11 @@ class ThreeWavesDownCalcltor(PatternCalcltor):
     cal_func: Callable = _three_waves_down_ins.update_bar
 
 
-class XiangTiZhengLiCalcltor(PatternCalcltor):
+class XiangTiZhengLiCalcltor(PatternCalcltorWithInterval):
     bar_num = 35  # todo 可以处理历史数据
 
-    def calculate(self, bars: Iterable[DbBarData]):
-        # K线间隔限定
-        intervals = [bar.interval for bar in bars]
-        assert len(intervals) == 1
-        # bar Dataframe
-        bar_df = pd.DataFrame(
-            sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
-
-        return XiangTiZhengLi(bar_df, intervals[0]).analyse_pattern
+    def cal_func(self, bar_df: DataFrame, interval: str):
+        return XiangTiZhengLi(bar_df, interval).analyse_pattern()
 
 
 class JDFJCalcltor(PatternCalcltor):
@@ -87,29 +95,11 @@ class SJZXCalcltor(PatternCalcltor):
     cal_func: Callable = SJZX
 
 
-class FindMUpperCalcltor(PatternCalcltor):
+class FindMUpperCalcltor(PatternCalcltorWithInterval):
     bar_num = 100
-
-    def calculate(self, bars: Iterable[DbBarData]):
-        # K线间隔限定
-        intervals = [bar.interval for bar in bars]
-        assert len(intervals) == 1
-        # bar Dataframe
-        bar_df = pd.DataFrame(
-            sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
-
-        return find_m_upper(bar_df, intervals[0])
+    cal_func: Callable = find_m_upper
 
 
-class FindHeadAndShoulders(PatternCalcltor):
+class FindHeadAndShoulders(PatternCalcltorWithInterval):
     bar_num = 150
-
-    def calculate(self, bars: Iterable[DbBarData]):
-        # K线间隔限定
-        intervals = [bar.interval for bar in bars]
-        assert len(intervals) == 1
-        # bar Dataframe
-        bar_df = pd.DataFrame(
-            sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
-
-        return find_head_and_shoulders(bar_df, intervals[0])
+    cal_func: Callable = find_head_and_shoulders
