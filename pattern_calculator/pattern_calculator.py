@@ -113,3 +113,8 @@ class FindWBottomCalcltor(PatternCalcltorWithInterval):
 class FindHeadAndShouldersBottomCalcltor(PatternCalcltorWithInterval):
     bar_num = 150
     cal_func: Callable = find_head_and_shoulders_bottom
+
+
+class GOLDENPITCalcltor(PatternCalcltorWithInterval):
+    bar_num = 30
+    cal_func: Callable = GOLDEN_PIT
