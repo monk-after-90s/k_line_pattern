@@ -1,7 +1,8 @@
 """形态计算器"""
-from cal_pattern import *
+from pattern_recognition import *
 from pandas import DataFrame
 from .pattern_calcltor_interface import *
+from collections import defaultdict
 
 
 class CSFRCalcltor(PatternCalcltor):
@@ -25,17 +26,31 @@ class DTZDCalcltor(PatternCalcltor):
 
 
 class ThreeWavesUpCalcltor(PatternCalcltor):
-    _three_waves_up_ins = ThreeWavesUp()
+    _three_waves_up_inss = defaultdict(lambda: ThreeWavesUp())
 
     bar_num = 1  # todo 可以处理历史数据
-    cal_func: Callable = _three_waves_up_ins.update_bar
+
+    def cal_func(self, bar_df: DataFrame):
+        # K线间隔
+        intervals = list(set(bar_df['interval']))
+        assert len(intervals) == 1
+        interval = intervals[0]
+
+        return self._three_waves_up_inss[interval].update_bar(bar_df)
 
 
 class ThreeWavesDownCalcltor(PatternCalcltor):
-    _three_waves_down_ins = ThreeWavesDown()
+    _three_waves_down_inss = defaultdict(lambda: ThreeWavesDown())
 
     bar_num = 1  # todo 可以处理历史数据
-    cal_func: Callable = _three_waves_down_ins.update_bar
+
+    def cal_func(self, bar_df: DataFrame):
+        # K线间隔
+        intervals = list(set(bar_df['interval']))
+        assert len(intervals) == 1
+        interval = intervals[0]
+
+        return self._three_waves_down_inss[interval].update_bar(bar_df)
 
 
 class XiangTiZhengLiCalcltor(PatternCalcltorWithInterval):
