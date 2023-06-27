@@ -35,4 +35,4 @@ class PatternCalcltorWithInterval(PatternCalcltor):
         bar_df = pd.DataFrame(
             sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
 
-        return self.cal_func(bar_df, intervals[0])
+        return type(self).cal_func(bar_df, intervals[0])
