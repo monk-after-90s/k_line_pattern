@@ -12,7 +12,7 @@ from apscheduler.util import undefined
 schedule_interval = float('inf')
 
 
-def cronjob_minute():
+def interval_to_cron_triggers():
     """将定时间隔转换成cron job的触发器列表"""
     triggers: List[CronTrigger] = []
 
@@ -44,7 +44,7 @@ def set_scheduler(job: Callable, event_loop: asyncio.get_event_loop()):
     """setup scheduler"""
     # 定时任务
     scheduler = AsyncIOScheduler(event_loop=event_loop)
-    triggers = cronjob_minute()
+    triggers = interval_to_cron_triggers()
     for trigger in triggers:
         scheduler.add_job(
             job,
