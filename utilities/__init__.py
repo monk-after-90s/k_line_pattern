@@ -5,3 +5,5 @@ VNPY_BN_INTERVAL_MAP = {"d": "1d", "4h": "4h", "1h": "1h", "30m": "30m"}
 
 # symbol转换
 from .convert_symbol import init_symbol_mapping, symbol_vnpy2united, symbol_united2vnpy
+
+from .leaf_derived_class import find_leaf_subclasses
