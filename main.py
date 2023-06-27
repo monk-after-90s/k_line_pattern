@@ -7,7 +7,7 @@ from apscheduler_job import set_scheduler
 from pattern_bars import query_newest_bars
 from pattern_calculator import pattern_calcltor_calsses
 from apscheduler_job import interval_filter
-from model import DbBarData, get_or_create_k_pattern_objects, KPattern, PatternMatchRecord
+from model import DbBarData, get_or_create_k_pattern_objects, KPattern, PatternMatchRecord, close_objects
 from pattern_calculator.pattern_calcltor_interface import PatternCalcltor
 from typing import Type, Iterable
 from utilities import symbol_vnpy2united, VNPY_BN_INTERVAL_MAP
@@ -72,6 +72,11 @@ async def cal_and_record_pattern(pattern_calcltor_calss: Type[PatternCalcltor],
             extra=extra)
 
 
+async def gracefully_exit():
+    """优雅退出"""
+    await close_objects()
+
+
 def main():
     # 事件循环
     loop = asyncio.get_event_loop()
@@ -82,6 +87,8 @@ def main():
     except:
         logger.info(f"Start gracefully exit")
         aioscheduler.shutdown()
+        loop.run_until_complete(gracefully_exit())
+        logger.info(f"Finish gracefully exit")
 
 
 if __name__ == '__main__':
