@@ -1,4 +1,7 @@
 from typing import Callable, Iterable
+
+import beeprint
+from loguru import logger
 from playhouse.shortcuts import model_to_dict
 from model import DbBarData
 from abc import ABC
@@ -21,6 +24,15 @@ class PatternCalcltor(ABC):
     def calculate(self, bars: Iterable[DbBarData]):
         bar_df = pd.DataFrame(
             sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
+
+        logger.debug(
+            f"""
+pattern_calcltor_class={type(self)}
+bar_df=
+{beeprint.pp({"head bar": f"{bar_df.iloc[0].exchange} {bar_df.iloc[0].symbol} {bar_df.iloc[0].interval} {bar_df.iloc[0].datetime}",
+              "tail bar": f"{bar_df.iloc[-1].exchange} {bar_df.iloc[-1].symbol} {bar_df.iloc[-1].interval} {bar_df.iloc[-1].datetime}"},
+             output=False,
+             sort_keys=False)}""")
         return type(self).cal_func(bar_df)
 
 

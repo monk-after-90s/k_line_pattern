@@ -22,7 +22,7 @@ async def job():
     """
     # 获取有更新的K线间隔
     intervals = interval_filter()
-    logger.info(f"intervals with new kline: {intervals}")
+    logger.info(f"intervals with new kline updated: {intervals}")
     # 获取bars
     symbol_exchange_interval_barses = await query_newest_bars(intervals)
     logger.info(
@@ -58,7 +58,16 @@ async def cal_and_record_pattern(pattern_calcltor_calss: Type[PatternCalcltor],
     match_res = pattern_calcltor_calss().calculate(symbol_exchange_interval_bars)
 
     end = asyncio.get_running_loop().time()
-    logger.info(f"{pattern_calcltor_calss} calculation spends:{end - start} seconds")
+    logger.info(
+        f"""
+{pattern_calcltor_calss=}
+symbol_exchange_interval_barses=
+{beeprint.pp({"head bar": f"{symbol_exchange_interval_bars[0].exchange} {symbol_exchange_interval_bars[0].symbol} {symbol_exchange_interval_bars[0].interval} {symbol_exchange_interval_bars[0].datetime}",
+              "tail bar": f"{symbol_exchange_interval_bars[-1].exchange} {symbol_exchange_interval_bars[-1].symbol} {symbol_exchange_interval_bars[-1].interval} {symbol_exchange_interval_bars[-1].datetime}",
+              "cost seconds": end - start,
+              "match_res": match_res},
+             output=False,
+             sort_keys=False)}""")
 
     if match_res is not None:
         # match_res:入选时间,形态开始时间，匹配度，extra
