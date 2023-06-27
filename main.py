@@ -1,4 +1,5 @@
 import asyncio
+
 import uvloop
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -13,6 +14,7 @@ from typing import Type, List
 from utilities import symbol_vnpy2united, VNPY_BN_INTERVAL_MAP
 import beeprint
 import signal
+import os
 
 
 async def job():
@@ -108,6 +110,9 @@ async def gracefully_exit():
 
 
 def main():
+    if os.environ.get("PYTHONUNBUFFERED") == "1":
+        logger.info(f"development mode")
+
     global loop
     # 事件循环
     loop = asyncio.get_event_loop()
