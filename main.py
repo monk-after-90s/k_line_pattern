@@ -11,6 +11,7 @@ from model import DbBarData, get_or_create_k_pattern_objects, KPattern, PatternM
 from pattern_calculator.pattern_calcltor_interface import PatternCalcltor
 from typing import Type, Iterable
 from utilities import symbol_vnpy2united, VNPY_BN_INTERVAL_MAP
+import beeprint
 
 
 async def job():
@@ -24,6 +25,8 @@ async def job():
     logger.info(f"intervals with new kline: {intervals}")
     # 获取bars
     symbol_exchange_interval_barses = await query_newest_bars(intervals)
+    logger.info(
+        f"symbol_exchange_interval_barses=\n{beeprint.pp(symbol_exchange_interval_barses, output=False, sort_keys=False)}")
 
     tasks = []
     # 获取pattern_calcltor类
