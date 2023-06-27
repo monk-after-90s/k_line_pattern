@@ -26,7 +26,14 @@ async def job():
     # 获取bars
     symbol_exchange_interval_barses = await query_newest_bars(intervals)
     logger.info(
-        f"symbol_exchange_interval_barses=\n{beeprint.pp(symbol_exchange_interval_barses, output=False, sort_keys=False)}")
+        f"""symbol_exchange_interval_barses=\n{
+        beeprint.pp(
+            [(f"{len(symbol_exchange_interval_bars)=}",
+              f"{symbol_exchange_interval_bars[0].exchange} {symbol_exchange_interval_bars[0].symbol} {symbol_exchange_interval_bars[0].interval} {symbol_exchange_interval_bars[0].datetime}",
+              f"{symbol_exchange_interval_bars[-1].exchange} {symbol_exchange_interval_bars[-1].symbol} {symbol_exchange_interval_bars[-1].interval} {symbol_exchange_interval_bars[-1].datetime}")
+             for symbol_exchange_interval_bars in symbol_exchange_interval_barses],
+            output=False,
+            sort_keys=False)}""")
 
     tasks = []
     # 获取pattern_calcltor类
