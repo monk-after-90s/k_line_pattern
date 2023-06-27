@@ -25,7 +25,7 @@ class WYGDCalcltor(PatternCalcltor):
 
 class DTZDCalcltor(PatternCalcltor):
     name = "断头铡刀"
-    bar_num = 2
+    bar_num = 20
     cal_func: Callable = DTZD
 
 
