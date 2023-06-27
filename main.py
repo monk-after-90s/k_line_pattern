@@ -58,16 +58,11 @@ async def cal_and_record_pattern(pattern_calcltor_class: Type[PatternCalcltor],
     recognize_res = pattern_calcltor_class().calculate(symbol_exchange_interval_bars)
 
     end = asyncio.get_running_loop().time()
-    logger.info(
-        f"""
-{pattern_calcltor_class=}
-symbol_exchange_interval_barses=
-{beeprint.pp({"head bar": f"{symbol_exchange_interval_bars[0].exchange} {symbol_exchange_interval_bars[0].symbol} {symbol_exchange_interval_bars[0].interval} {symbol_exchange_interval_bars[0].datetime}",
-              "tail bar": f"{symbol_exchange_interval_bars[-1].exchange} {symbol_exchange_interval_bars[-1].symbol} {symbol_exchange_interval_bars[-1].interval} {symbol_exchange_interval_bars[-1].datetime}",
-              "cost seconds": end - start,
-              "match_res": match_res},
-             output=False,
-             sort_keys=False)}""")
+    logger.info(beeprint.pp({"pattern_calcltor_class": pattern_calcltor_class,
+                             "cost seconds": end - start,
+                             "recognize_res": recognize_res},
+                            output=False,
+                            sort_keys=False))
 
     if recognize_res is not None:
         # recognize_res:入选时间,形态开始时间，匹配度，extra
