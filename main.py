@@ -9,7 +9,7 @@ from pattern_calculator import pattern_calcltor_calsses
 from apscheduler_job import interval_filter
 from model import DbBarData, get_or_create_k_pattern_objects, KPattern, PatternMatchRecord, close_objects
 from pattern_calculator.pattern_calcltor_interface import PatternCalcltor
-from typing import Type, Iterable
+from typing import Type, List
 from utilities import symbol_vnpy2united, VNPY_BN_INTERVAL_MAP
 import beeprint
 
@@ -47,7 +47,7 @@ async def job():
 
 
 async def cal_and_record_pattern(pattern_calcltor_calss: Type[PatternCalcltor],
-                                 symbol_exchange_interval_bars: Iterable[DbBarData]):
+                                 symbol_exchange_interval_bars: List[DbBarData]):
     """计算和存储K线的形态匹配结果"""
     # K线匹配结果model objects
     k_pattern_objects = await get_or_create_k_pattern_objects()
