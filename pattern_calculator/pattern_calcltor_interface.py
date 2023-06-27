@@ -29,7 +29,7 @@ class PatternCalcltorWithInterval(PatternCalcltor):
 
     def calculate(self, bars: Iterable[DbBarData]):
         # K线间隔
-        intervals = [bar.interval for bar in bars]
+        intervals = list({bar.interval for bar in bars})
         assert len(intervals) == 1
         # bar Dataframe
         bar_df = pd.DataFrame(
