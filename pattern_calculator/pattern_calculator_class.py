@@ -35,13 +35,14 @@ class ThreeWavesUpCalcltor(PatternCalcltor):
 
     bar_num = 1  # todo 可以处理历史数据
 
-    def cal_func(self, bar_df: DataFrame):
+    @classmethod
+    def cal_func(cls, bar_df: DataFrame):
         # K线间隔
         intervals = list(set(bar_df['interval']))
         assert len(intervals) == 1
         interval = intervals[0]
 
-        return self._three_waves_up_inss[interval].update_bar(bar_df)
+        return cls._three_waves_up_inss[interval].update_bar(bar_df)
 
 
 class ThreeWavesDownCalcltor(PatternCalcltor):
@@ -50,20 +51,22 @@ class ThreeWavesDownCalcltor(PatternCalcltor):
 
     bar_num = 1  # todo 可以处理历史数据
 
-    def cal_func(self, bar_df: DataFrame):
+    @classmethod
+    def cal_func(cls, bar_df: DataFrame):
         # K线间隔
         intervals = list(set(bar_df['interval']))
         assert len(intervals) == 1
         interval = intervals[0]
 
-        return self._three_waves_down_inss[interval].update_bar(bar_df)
+        return cls._three_waves_down_inss[interval].update_bar(bar_df)
 
 
 class XiangTiZhengLiCalcltor(PatternCalcltorWithInterval):
     name = "箱体震荡"
     bar_num = 35  # todo 可以处理历史数据
 
-    def cal_func(self, bar_df: DataFrame, interval: str):
+    @classmethod
+    def cal_func(cls, bar_df: DataFrame, interval: str):
         return XiangTiZhengLi(bar_df, interval).analyse_pattern()
 
 
