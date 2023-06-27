@@ -45,13 +45,18 @@ def set_scheduler(job: Callable, event_loop: asyncio.get_event_loop()):
     # 定时任务
     scheduler = AsyncIOScheduler(event_loop=event_loop)
     triggers = interval_to_cron_triggers()
+
+    # 立即触发标识，用于开发
+    next_run_time_set = False
+    # 定时trigger绑定job
     for trigger in triggers:
         scheduler.add_job(
             job,
             trigger=trigger,
             max_instances=1,
-            next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=1) if os.environ.get(
-                "PYTHONUNBUFFERED") == "1" else undefined)
+            next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=1)
+            if os.environ.get("PYTHONUNBUFFERED") == "1" and not next_run_time_set else undefined)
+        next_run_time_set = True
     scheduler.start()
     return scheduler
 
