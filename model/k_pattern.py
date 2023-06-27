@@ -15,7 +15,7 @@ objects: Optional[peewee_async.Manager] = None
 
 
 async def get_or_create_k_pattern_objects():
-    """获取K线柱子数据数据库的入口objects"""
+    """获取K线形态数据库的入口objects"""
     global objects
     if objects is None:
         objects = peewee_async.Manager(db, loop=asyncio.get_event_loop())
