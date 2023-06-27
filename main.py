@@ -21,6 +21,7 @@ async def job():
     """
     # 获取有更新的K线间隔
     intervals = interval_filter()
+    logger.info(f"intervals with new kline: {intervals}")
     # 获取bars
     symbol_exchange_interval_barses = await query_newest_bars(intervals)
 
