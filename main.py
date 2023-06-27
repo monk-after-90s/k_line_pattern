@@ -55,7 +55,7 @@ async def cal_and_record_pattern(pattern_calcltor_class: Type[PatternCalcltor],
     # 计算过程的起始时间
     start = asyncio.get_running_loop().time()
     # 匹配结果
-    match_res = pattern_calcltor_class().calculate(symbol_exchange_interval_bars)
+    recognize_res = pattern_calcltor_class().calculate(symbol_exchange_interval_bars)
 
     end = asyncio.get_running_loop().time()
     logger.info(
@@ -69,11 +69,11 @@ symbol_exchange_interval_barses=
              output=False,
              sort_keys=False)}""")
 
-    if match_res is not None:
-        # match_res:入选时间,形态开始时间，匹配度，extra
+    if recognize_res is not None:
+        # recognize_res:入选时间,形态开始时间，匹配度，extra
         entry_datetime, start_datetime, matching_score = \
-            match_res['EntryTime'], match_res['StartTime'], match_res['MatchingScore']
-        extra = {k: v for k, v in match_res.items() if k not in ['EntryTime', 'StartTime', 'MatchingScore']}
+            recognize_res['EntryTime'], recognize_res['StartTime'], recognize_res['MatchingScore']
+        extra = {k: v for k, v in recognize_res.items() if k not in ['EntryTime', 'StartTime', 'MatchingScore']}
         # 查询形态
         k_pattern: KPattern = await k_pattern_objects.get(KPattern, KPattern.name == pattern_calcltor_class.name)
         # 存储匹配结果
