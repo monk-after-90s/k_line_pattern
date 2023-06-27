@@ -1,5 +1,4 @@
 import asyncio
-import datetime
 import time
 from typing import List, Callable
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -46,8 +45,7 @@ def set_scheduler(job: Callable, event_loop: asyncio.get_event_loop()):
     for trigger in triggers:
         scheduler.add_job(job,
                           trigger=trigger,
-                          max_instances=1,
-                          next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=1))
+                          max_instances=1)
     scheduler.start()
     return scheduler
 
