@@ -1,7 +1,7 @@
 import asyncio
 from typing import Iterable, List
 from model import get_or_create_bar_objects, DbBarData, DbBarOverview
-from pattern_calculator import pattern_calcltor_calsses
+from pattern_calculator import pattern_calcltor_classes
 
 
 async def query_newest_bars(intervals: List):
@@ -28,7 +28,7 @@ async def _query_newest_bars(symbol: str, exchange: str, interval: str):
     :return: 按datetime排序的K线列表
     """
     # 需要的最大的Kline Bar数量
-    max_bar_num: int = max(pattern_calcltor_calss.bar_num for pattern_calcltor_calss in pattern_calcltor_calsses)
+    max_bar_num: int = max(pattern_calcltor_class.bar_num for pattern_calcltor_class in pattern_calcltor_classes)
     bar_objects = await get_or_create_bar_objects()
     bars: Iterable[DbBarData] = await bar_objects.execute(DbBarData.select().where(
         (DbBarData.symbol == symbol) & (DbBarData.exchange == exchange) & (DbBarData.interval == interval)). \

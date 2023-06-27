@@ -5,7 +5,7 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 from loguru import logger
 from apscheduler_job import set_scheduler
 from pattern_bars import query_newest_bars
-from pattern_calculator import pattern_calcltor_calsses
+from pattern_calculator import pattern_calcltor_classes
 from apscheduler_job import interval_filter
 from model import DbBarData, get_or_create_k_pattern_objects, KPattern, PatternMatchRecord, close_objects
 from pattern_calculator.pattern_calcltor_interface import PatternCalcltor
@@ -37,7 +37,7 @@ async def job():
 
     tasks = []
     # 获取pattern_calcltor类
-    for pattern_calcltor_class in pattern_calcltor_calsses:
+    for pattern_calcltor_class in pattern_calcltor_classes:
         # 将bars给pattern_calcltor消化
         for symbol_exchange_interval_bars in symbol_exchange_interval_barses:
             tasks.append(
@@ -46,7 +46,7 @@ async def job():
     [await task for task in tasks]
 
 
-async def cal_and_record_pattern(pattern_calcltor_calss: Type[PatternCalcltor],
+async def cal_and_record_pattern(pattern_calcltor_class: Type[PatternCalcltor],
                                  symbol_exchange_interval_bars: List[DbBarData]):
     """计算和存储K线的形态匹配结果"""
     # K线匹配结果model objects
@@ -55,12 +55,12 @@ async def cal_and_record_pattern(pattern_calcltor_calss: Type[PatternCalcltor],
     # 计算过程的起始时间
     start = asyncio.get_running_loop().time()
     # 匹配结果
-    match_res = pattern_calcltor_calss().calculate(symbol_exchange_interval_bars)
+    match_res = pattern_calcltor_class().calculate(symbol_exchange_interval_bars)
 
     end = asyncio.get_running_loop().time()
     logger.info(
         f"""
-{pattern_calcltor_calss=}
+{pattern_calcltor_class=}
 symbol_exchange_interval_barses=
 {beeprint.pp({"head bar": f"{symbol_exchange_interval_bars[0].exchange} {symbol_exchange_interval_bars[0].symbol} {symbol_exchange_interval_bars[0].interval} {symbol_exchange_interval_bars[0].datetime}",
               "tail bar": f"{symbol_exchange_interval_bars[-1].exchange} {symbol_exchange_interval_bars[-1].symbol} {symbol_exchange_interval_bars[-1].interval} {symbol_exchange_interval_bars[-1].datetime}",
@@ -75,7 +75,7 @@ symbol_exchange_interval_barses=
             match_res['EntryTime'], match_res['StartTime'], match_res['MatchingScore']
         extra = {k: v for k, v in match_res.items() if k not in ['EntryTime', 'StartTime', 'MatchingScore']}
         # 查询形态
-        k_pattern: KPattern = await k_pattern_objects.get(KPattern, KPattern.name == pattern_calcltor_calss.name)
+        k_pattern: KPattern = await k_pattern_objects.get(KPattern, KPattern.name == pattern_calcltor_class.name)
         # 存储匹配结果
         for symbol_exchange_interval_bar in symbol_exchange_interval_bars:
             break
