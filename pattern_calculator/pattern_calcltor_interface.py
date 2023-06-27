@@ -21,7 +21,7 @@ class PatternCalcltor(ABC):
     def calculate(self, bars: Iterable[DbBarData]):
         bar_df = pd.DataFrame(
             sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
-        return self.cal_func(bar_df)
+        return type(self).cal_func(bar_df)
 
 
 class PatternCalcltorWithInterval(PatternCalcltor):
