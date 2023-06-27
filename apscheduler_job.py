@@ -1,11 +1,13 @@
 import asyncio
 import datetime
+import os
 import time
 from typing import List, Callable
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from config import INTERVALS
 from utilities import INTERVAL_SECS_MAP as interval_secs_map
+from apscheduler.util import undefined
 
 schedule_interval = float('inf')
 
@@ -44,10 +46,12 @@ def set_scheduler(job: Callable, event_loop: asyncio.get_event_loop()):
     scheduler = AsyncIOScheduler(event_loop=event_loop)
     triggers = cronjob_minute()
     for trigger in triggers:
-        scheduler.add_job(job,
-                          trigger=trigger,
-                          max_instances=1,
-                          next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=1))
+        scheduler.add_job(
+            job,
+            trigger=trigger,
+            max_instances=1,
+            next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=1) if os.environ.get(
+                "PYTHONUNBUFFERED") == "1" else undefined)
     scheduler.start()
     return scheduler
 
