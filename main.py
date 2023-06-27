@@ -12,6 +12,7 @@ from pattern_calculator.pattern_calcltor_interface import PatternCalcltor
 from typing import Type, List
 from utilities import symbol_vnpy2united, VNPY_BN_INTERVAL_MAP
 import beeprint
+import signal
 
 
 async def job():
@@ -89,19 +90,32 @@ async def cal_and_record_pattern(pattern_calcltor_class: Type[PatternCalcltor],
             extra=extra)
 
 
+# 事件循环
+loop: asyncio.BaseEventLoop | None = None
+
+
+def handle_sigterm(sig, frame):
+    # 暂停事件循环
+    loop.stop()
+
+
+signal.signal(signal.SIGTERM, handle_sigterm)
+
+
 async def gracefully_exit():
     """优雅退出"""
     await close_objects()
 
 
 def main():
+    global loop
     # 事件循环
     loop = asyncio.get_event_loop()
     # 异步定时器
     aioscheduler = set_scheduler(job, loop)
     try:
         loop.run_forever()
-    except:
+    finally:
         logger.info(f"Start gracefully exit")
         aioscheduler.shutdown()
         loop.run_until_complete(gracefully_exit())
