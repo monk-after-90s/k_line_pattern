@@ -24,7 +24,7 @@ class PatternCalcltor(ABC):
         return self.cal_func(bar_df)
 
 
-class PatternCalcltorWithInterval(ABC, PatternCalcltor):
+class PatternCalcltorWithInterval(PatternCalcltor):
     """带有interval参数的形态计算器"""
 
     def calculate(self, bars: Iterable[DbBarData]):
