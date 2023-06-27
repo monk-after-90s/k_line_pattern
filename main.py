@@ -41,7 +41,7 @@ async def job():
         # 将bars给pattern_calcltor消化
         for symbol_exchange_interval_bars in symbol_exchange_interval_barses:
             tasks.append(
-                cal_and_record_pattern(pattern_calcltor_class, symbol_exchange_interval_bars))
+                asyncio.create_task(cal_and_record_pattern(pattern_calcltor_class, symbol_exchange_interval_bars)))
 
     [await task for task in tasks]
 
