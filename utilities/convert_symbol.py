@@ -99,7 +99,6 @@ async def symbol_vnpy2united(exchange: str, vnpy_symbol: str, init=False):
             async with lock:
                 ...
             # 直接转换
-            logger.debug(f"直接转换 {exchange=} {vnpy_symbol=}")
             return await symbol_vnpy2united(exchange, vnpy_symbol)
     try:
         contract: ContractData = vnpy_symbol_contract_mapping[exchange][vnpy_symbol]
@@ -127,7 +126,6 @@ async def symbol_united2vnpy(exchange: str, symbol_type: str, united_symbol: str
             async with lock:
                 ...
             # 直接转换
-            logger.debug(f"直接转换 {exchange=} {symbol_type=} {united_symbol=}")
             return await symbol_united2vnpy(exchange, symbol_type, united_symbol)
 
     try:
