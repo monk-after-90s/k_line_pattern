@@ -3,6 +3,7 @@ from pattern_recognition import *
 from pandas import DataFrame
 from .pattern_calcltor_interface import *
 from collections import defaultdict
+from .ThreeWaves_helper import Exchange
 
 
 class CSFRCalcltor(PatternCalcltor):
@@ -31,34 +32,50 @@ class DTZDCalcltor(PatternCalcltor):
 
 class ThreeWavesUpCalcltor(PatternCalcltor):
     name = "三浪上涨"
-    _three_waves_up_inss = defaultdict(lambda: ThreeWavesUp())
+    _three_waves_up_inss = defaultdict(lambda: Exchange(ThreeWavesUp))
 
     bar_num = 1  # todo 可以处理历史数据
 
     @classmethod
     def cal_func(cls, bar_df: DataFrame):
+        # K线交易所
+        exchanges = list(set(bar_df['exchange']))
+        assert len(exchanges) == 1
+        exchange = exchanges[0]
+        # K线市场
+        symbols = list(set(bar_df['symbol']))
+        assert len(symbols) == 1
+        symbol = symbols[0]
         # K线间隔
         intervals = list(set(bar_df['interval']))
         assert len(intervals) == 1
         interval = intervals[0]
 
-        return cls._three_waves_up_inss[interval].update_bar(bar_df)
+        return cls._three_waves_up_inss[exchange].symbols[symbol].intervals[interval].calculator.update_bar(bar_df)
 
 
 class ThreeWavesDownCalcltor(PatternCalcltor):
     name = "三浪下跌"
-    _three_waves_down_inss = defaultdict(lambda: ThreeWavesDown())
+    _three_waves_down_inss = defaultdict(lambda: Exchange(ThreeWavesDown))
 
     bar_num = 1  # todo 可以处理历史数据
 
     @classmethod
     def cal_func(cls, bar_df: DataFrame):
+        # K线交易所
+        exchanges = list(set(bar_df['exchange']))
+        assert len(exchanges) == 1
+        exchange = exchanges[0]
+        # K线市场
+        symbols = list(set(bar_df['symbol']))
+        assert len(symbols) == 1
+        symbol = symbols[0]
         # K线间隔
         intervals = list(set(bar_df['interval']))
         assert len(intervals) == 1
         interval = intervals[0]
 
-        return cls._three_waves_down_inss[interval].update_bar(bar_df)
+        return cls._three_waves_down_inss[exchange].symbols[symbol].intervals[interval].calculator.update_bar(bar_df)
 
 
 class XiangTiZhengLiCalcltor(PatternCalcltorWithInterval):
