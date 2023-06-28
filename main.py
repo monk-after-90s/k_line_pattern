@@ -83,7 +83,6 @@ async def cal_and_record_pattern(pattern_calcltor_class: Type[PatternCalcltor],
             break
         symbol_type, united_symbol = await symbol_vnpy2united(symbol_exchange_interval_bar.exchange,
                                                               symbol_exchange_interval_bar.symbol)
-        # todo 时区修正
         try:
             await k_pattern_objects.create(
                 PatternRecognizeRecord,
