@@ -5,7 +5,6 @@ import asyncio
 import importlib
 import time
 from collections import defaultdict
-
 from vnpy.trader.constant import Product
 from vnpy.trader.engine import MainEngine
 from vnpy.trader.object import ContractData
@@ -22,6 +21,8 @@ vnpy_symbol_contract_mapping = defaultdict(dict)
 united_symbol_contract_mapping = defaultdict(lambda: defaultdict(dict))
 # gateway
 gateway_classes = (BinanceSpotGateway, BinanceUsdtGateway, BinanceInverseGateway)
+# 初始化锁
+lock = asyncio.Lock()
 
 
 def get_symbol_type(contract: ContractData):
@@ -89,7 +90,17 @@ async def symbol_vnpy2united(exchange: str, vnpy_symbol: str, init=False):
     :return: symbol_type(spot、futures)，united_symbol(BTC/USDT)
     """
     if init:
-        await asyncio.get_running_loop().run_in_executor(None, init_symbol_mapping)
+        # 没有其他初始化过程
+        if not lock.locked():
+            # 初始化
+            async with lock:
+                await asyncio.get_running_loop().run_in_executor(None, init_symbol_mapping)
+        else:  # 有其他初始化过程，等初始化完成
+            async with lock:
+                ...
+            # 直接转换
+            logger.debug(f"直接转换 {exchange=} {vnpy_symbol=}")
+            return await symbol_vnpy2united(exchange, vnpy_symbol)
     try:
         contract: ContractData = vnpy_symbol_contract_mapping[exchange][vnpy_symbol]
         return get_symbol_type(contract), contract.name
@@ -120,13 +131,19 @@ async def symbol_united2vnpy(exchange: str, symbol_type: str, united_symbol: str
 
 
 if __name__ == '__main__':
-    async def test():
-        print(await symbol_vnpy2united('BINANCE', 'btcusdt'))
-        print(await symbol_vnpy2united('BINANCE', 'ltcusdt'))
-        print(await symbol_united2vnpy('BINANCE', 'spot', "ETH/USDT"))
-        print(await symbol_united2vnpy('BINANCE', 'futures', "LTC/USDT"))
+    from loguru import logger
 
-        print(await symbol_united2vnpy('OKEX', 'futures', "LTC/USDT"))
+
+    async def test():
+        logger.info(await asyncio.gather(symbol_vnpy2united('BINANCE', 'btcusdt'),
+                                         symbol_vnpy2united('BINANCE', 'ltcusdt'),
+                                         symbol_vnpy2united('BINANCE', 'ethusdt'),
+                                         symbol_vnpy2united('BINANCE', 'bnbusdt'),
+                                         ))
+        # logger.info(await symbol_united2vnpy('BINANCE', 'spot', "ETH/USDT"))
+        # logger.info(await symbol_united2vnpy('BINANCE', 'futures', "LTC/USDT"))
+        #
+        # logger.info(await symbol_united2vnpy('OKEX', 'futures', "LTC/USDT"))
 
 
     asyncio.run(test())
