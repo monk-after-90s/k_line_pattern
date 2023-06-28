@@ -1,5 +1,6 @@
 import asyncio
 
+import peewee
 import uvloop
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -80,16 +81,22 @@ async def cal_and_record_pattern(pattern_calcltor_class: Type[PatternCalcltor],
         # 存储匹配结果
         for symbol_exchange_interval_bar in symbol_exchange_interval_bars:
             break
-        await k_pattern_objects.create(
-            PatternRecognizeRecord,
-            pattern_id=k_pattern.id,
-            symbol=await symbol_vnpy2united(symbol_exchange_interval_bar.exchange,
-                                            symbol_exchange_interval_bar.symbol),
-            k_interval=VNPY_BN_INTERVAL_MAP[symbol_exchange_interval_bar.interval],
-            match_score=matching_score,
-            pattern_end=entry_datetime,
-            pattern_start=start_datetime,
-            extra=extra)
+        symbol_type, united_symbol = await symbol_vnpy2united(symbol_exchange_interval_bar.exchange,
+                                                              symbol_exchange_interval_bar.symbol)
+        # todo 时区修正
+        try:
+            await k_pattern_objects.create(
+                PatternRecognizeRecord,
+                pattern_id=k_pattern.id,
+                symbol_type=symbol_type,
+                symbol=united_symbol,
+                k_interval=VNPY_BN_INTERVAL_MAP[symbol_exchange_interval_bar.interval],
+                match_score=matching_score,
+                pattern_end=entry_datetime,
+                pattern_start=start_datetime,
+                extra=extra)
+        except peewee.IntegrityError:
+            pass
 
 
 # 事件循环
