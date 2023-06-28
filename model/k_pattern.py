@@ -55,6 +55,7 @@ class PatternRecognizeRecord(BaseModel):
     pattern_id = IntegerField(column_name='patternId')
     pattern_start = DateTimeField(column_name='patternStart', constraints=[SQL("DEFAULT CURRENT_TIMESTAMP")])
     symbol = CharField()  # 市场符号，如BTC/USDT
+    symbol_type = CharField()  # 市场类型:spot、futures
 
     class Meta:
         table_name = 'pattern_recognize_record'
