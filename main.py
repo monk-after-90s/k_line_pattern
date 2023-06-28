@@ -86,7 +86,7 @@ async def cal_and_record_pattern(pattern_calcltor_class: Type[PatternCalcltor],
             symbol=await symbol_vnpy2united(symbol_exchange_interval_bar.exchange,
                                             symbol_exchange_interval_bar.symbol),
             k_interval=VNPY_BN_INTERVAL_MAP[symbol_exchange_interval_bar.interval],
-            match_degree=matching_score,
+            match_score=matching_score,
             pattern_end=entry_datetime,
             pattern_start=start_datetime,
             extra=extra)
