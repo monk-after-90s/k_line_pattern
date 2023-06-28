@@ -8,7 +8,7 @@ from apscheduler_job import set_scheduler
 from pattern_bars import query_newest_bars
 from pattern_calculator import pattern_calcltor_classes
 from apscheduler_job import interval_filter
-from model import DbBarData, get_or_create_k_pattern_objects, KPattern, PatternMatchRecord, close_objects
+from model import DbBarData, get_or_create_k_pattern_objects, KPattern, PatternRecognizeRecord, close_objects
 from pattern_calculator.pattern_calcltor_interface import PatternCalcltor
 from typing import Type, List
 from utilities import symbol_vnpy2united, VNPY_BN_INTERVAL_MAP
@@ -81,7 +81,7 @@ async def cal_and_record_pattern(pattern_calcltor_class: Type[PatternCalcltor],
         for symbol_exchange_interval_bar in symbol_exchange_interval_bars:
             break
         await k_pattern_objects.create(
-            PatternMatchRecord,
+            PatternRecognizeRecord,
             pattern_id=k_pattern.id,
             symbol=await symbol_vnpy2united(symbol_exchange_interval_bar.exchange,
                                             symbol_exchange_interval_bar.symbol),
