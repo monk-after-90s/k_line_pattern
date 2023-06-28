@@ -46,7 +46,7 @@ def init_symbol_mapping():
     for gateway_classe in gateway_classes:
         main_engine.add_gateway(gateway_classe)
         main_engine.connect(
-            setting=defaultdict(lambda: ''),
+            setting={'key': "", 'secret': "", "代理地址": "", "代理端口": "", "服务器": "REAL"},
             gateway_name=gateway_classe.default_name)
     time.sleep(5)  # 等待连接完成
     try:
