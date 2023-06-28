@@ -30,6 +30,9 @@ def interval_to_cron_triggers():
 
 def interval_filter():
     """根据时间戳决定当前哪个周期的K线有更新"""
+    if os.environ.get("PYTHONUNBUFFERED") == "1":
+        return ['1h']
+
     ts = time.time()
     pruned_ts = ts // schedule_interval * schedule_interval
 
