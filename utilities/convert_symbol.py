@@ -113,12 +113,22 @@ async def symbol_vnpy2united(exchange: str, vnpy_symbol: str, init=False):
 
 async def symbol_united2vnpy(exchange: str, symbol_type: str, united_symbol: str, init=False):
     """
-    通用symbol到vnpy symbol
+    通用symbol到vnpy symbol fixme 测试
 
     :return: vnpy symbol如btcusdt，表示币安现货的BTC/USDT
     """
     if init:
-        await asyncio.get_running_loop().run_in_executor(None, init_symbol_mapping)
+        # 没有其他初始化过程
+        if not lock.locked():
+            # 初始化
+            async with lock:
+                await asyncio.get_running_loop().run_in_executor(None, init_symbol_mapping)
+        else:  # 有其他初始化过程，等初始化完成
+            async with lock:
+                ...
+            # 直接转换
+            logger.debug(f"直接转换 {exchange=} {symbol_type=} {united_symbol=}")
+            return await symbol_united2vnpy(exchange, symbol_type, united_symbol)
 
     try:
         contract: ContractData = united_symbol_contract_mapping[exchange][symbol_type][united_symbol]
@@ -140,10 +150,10 @@ if __name__ == '__main__':
                                          symbol_vnpy2united('BINANCE', 'ethusdt'),
                                          symbol_vnpy2united('BINANCE', 'bnbusdt'),
                                          ))
-        # logger.info(await symbol_united2vnpy('BINANCE', 'spot', "ETH/USDT"))
-        # logger.info(await symbol_united2vnpy('BINANCE', 'futures', "LTC/USDT"))
-        #
-        # logger.info(await symbol_united2vnpy('OKEX', 'futures', "LTC/USDT"))
+        logger.info(await symbol_united2vnpy('BINANCE', 'spot', "ETH/USDT"))
+        logger.info(await symbol_united2vnpy('BINANCE', 'futures', "LTC/USDT"))
+
+        logger.info(await symbol_united2vnpy('OKEX', 'futures', "LTC/USDT"))
 
 
     asyncio.run(test())
