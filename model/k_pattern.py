@@ -3,7 +3,7 @@ import asyncio
 import peewee_async
 from peewee import *
 import config
-from playhouse.mysql_ext import JSONField
+from utilities import TimestampJSONField
 
 db = peewee_async.MySQLDatabase(database=config.DB,
                                 user=config.DB_USER,
@@ -48,7 +48,7 @@ class KPattern(BaseModel):
 
 
 class PatternRecognizeRecord(BaseModel):
-    extra = JSONField(null=True)  # json
+    extra = TimestampJSONField(null=True)  # json
     match_score = FloatField(column_name='matchScore')
     pattern_end = DateTimeField(column_name='patternEnd', constraints=[SQL("DEFAULT CURRENT_TIMESTAMP")])
     pattern_id = IntegerField(column_name='patternId')
