@@ -1,7 +1,7 @@
 """使pandas的Timestamp对象可以JSON serializable到peewee model的JSONField"""
 import json
 from playhouse.mysql_ext import JSONField
-from .convert_datetime import convert_to_sh, convert_to_utc
+from .convert_pd_timestamp import convert_to_sh, convert_to_utc
 import pandas as pd
 
 
