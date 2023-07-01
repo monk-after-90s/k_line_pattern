@@ -1,3 +1,5 @@
+# 时区 不能改动!
+TIMEZONE = "Asia/Shanghai"
 # db0
 DB_HOST = "localhost"
 DB_PORT = 3306
