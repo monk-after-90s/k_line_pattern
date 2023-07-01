@@ -121,7 +121,7 @@ def main():
         logger.info(f"development mode")
 
     global loop
-    # 事件循环
+    # 事件循环 todo 完善历史形态回算
     loop = asyncio.get_event_loop()
     # 异步定时器
     aioscheduler = set_scheduler(job, loop)
