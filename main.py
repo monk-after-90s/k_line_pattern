@@ -72,7 +72,8 @@ async def cal_and_record_pattern(pattern_calcltor_class: Type[PatternCalcltor],
             sort_keys=False))
 
     if recognize_res is not None:
-        logger.debug(f"recognize_res={beeprint.pp(recognize_res, output=False, sort_keys=False)}")
+        if isinstance(recognize_res, str):
+            logger.info(f"{recognize_res=}")
         # recognize_res:入选时间,形态开始时间，匹配度，extra
         entry_datetime, start_datetime, matching_score = \
             recognize_res['EntryTime'], recognize_res['StartTime'], recognize_res['MatchingScore']
