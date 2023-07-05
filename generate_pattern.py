@@ -34,8 +34,11 @@ async def cal_and_record_pattern(pattern_calcltor_class: Type[PatternCalcltor],
 
     if recognize_res is not None:
         if isinstance(recognize_res, str):
-            logger.info(f"{recognize_res=}")
-            logger.info(f"{pattern_calcltor_class=}")
+            logger.info(f"""
+            {recognize_res=}
+            {len(symbol_exchange_interval_bars)=}
+            {pattern_calcltor_class=}
+            """)
         # recognize_res:入选时间,形态开始时间，匹配度，extra
         entry_datetime, start_datetime, matching_score = \
             recognize_res['EntryTime'], recognize_res['StartTime'], recognize_res['MatchingScore']
