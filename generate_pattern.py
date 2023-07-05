@@ -40,7 +40,8 @@ async def cal_and_record_pattern(pattern_calcltor_class: Type[PatternCalcltor],
             {pattern_calcltor_class=}
             """)
 
-        if isinstance(recognize_res, dict):
+        if isinstance(recognize_res,
+                      dict) and 'EntryTime' in recognize_res and 'StartTime' in recognize_res and 'MatchingScore' in recognize_res:
             # recognize_res:入选时间,形态开始时间，匹配度，extra
             entry_datetime, start_datetime, matching_score = \
                 recognize_res['EntryTime'], recognize_res['StartTime'], recognize_res['MatchingScore']
