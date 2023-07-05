@@ -1,7 +1,6 @@
 aiomysql==0.2.0
 APScheduler==3.10.1
 beeprint==2.4.10
-better_exceptions==0.3.3
 fastdtw==0.3.4
 importlib-metadata==6.7.0
 loguru==0.7.0
