@@ -46,12 +46,14 @@ async def cal_and_record_pattern(pattern_calcltor_class: Type[PatternCalcltor],
                 recognize_res['EntryTime'], recognize_res['StartTime'], recognize_res['MatchingScore']
             extra = {k: v for k, v in recognize_res.items() if k not in ['EntryTime', 'StartTime', 'MatchingScore']}
             # 查询形态
-            k_pattern: KPattern = await k_pattern_objects.get(KPattern, KPattern.name == pattern_calcltor_class.name)
+            k_pattern_task = asyncio.create_task(
+                k_pattern_objects.get(KPattern, KPattern.name == pattern_calcltor_class.name))
             # 存储匹配结果
             for symbol_exchange_interval_bar in symbol_exchange_interval_bars:
                 break
             symbol_type, united_symbol = await symbol_vnpy2united(symbol_exchange_interval_bar.exchange,
                                                                   symbol_exchange_interval_bar.symbol)
+            k_pattern = await k_pattern_task
             try:
                 await k_pattern_objects.create(
                     PatternRecognizeRecord,
