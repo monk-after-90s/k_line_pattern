@@ -48,7 +48,7 @@ async def flush(executor: ProcessPoolExecutor):
     """填充历史形态记录"""
     # 查找续接日期
     newest_record_dt: datetime | None = await (await get_or_create_k_pattern_objects()).scalar(
-        PatternRecognizeRecord.select(fn.MAX(PatternRecognizeRecord.pattern_end)))
+        PatternRecognizeRecord.select(fn.Max(PatternRecognizeRecord.pattern_end)))
     if newest_record_dt is not None:
         newest_record_dt = convert_to_sh(newest_record_dt)
     # 分周期处理
