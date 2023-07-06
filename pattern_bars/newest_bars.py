@@ -1,7 +1,8 @@
 import asyncio
 from typing import Iterable, List
-from orm import get_or_create_bar_objects, DbBarData, DbBarOverview
+from orm import bar_asess_fctry, Dbbardata, Dbbaroverview
 from pattern_calculator import pattern_calcltor_classes
+from sqlalchemy import select
 
 
 async def query_newest_bars(intervals: List):
@@ -12,13 +13,14 @@ async def query_newest_bars(intervals: List):
     :return:
     """
     # 获取symbol配置，分配任务
-    bar_objects = await get_or_create_bar_objects()
-    # 获取symbol配置
-    bar_configs: Iterable[DbBarOverview] = await bar_objects.execute(
-        DbBarOverview.select().where(DbBarOverview.interval.in_(intervals)))
-    return await asyncio.gather(
-        *(_query_newest_bars(bar_config.symbol, bar_config.exchange, bar_config.interval) for bar_config in
-          bar_configs))
+    async with bar_asess_fctry() as session:
+        # 获取symbol配置
+        bar_configs: Iterable[Dbbaroverview] = (await session.execute(
+            select(Dbbaroverview).where(Dbbaroverview.interval.in_(intervals))
+        )).scalars().all()
+        return await asyncio.gather(
+            *(_query_newest_bars(bar_config.symbol, bar_config.exchange, bar_config.interval) for bar_config in
+              bar_configs))
 
 
 async def _query_newest_bars(symbol: str, exchange: str, interval: str):
@@ -29,9 +31,14 @@ async def _query_newest_bars(symbol: str, exchange: str, interval: str):
     """
     # 需要的最大的Kline Bar数量
     max_bar_num: int = max(pattern_calcltor_class.bar_num for pattern_calcltor_class in pattern_calcltor_classes)
-    bar_objects = await get_or_create_bar_objects()
-    bars: Iterable[DbBarData] = await bar_objects.execute(DbBarData.select().where(
-        (DbBarData.symbol == symbol) & (DbBarData.exchange == exchange) & (DbBarData.interval == interval)). \
-                                                          order_by(DbBarData.datetime.desc()).limit(max_bar_num))
-    bars = sorted(bars, key=lambda item: item.datetime)
-    return bars
+
+    async with bar_asess_fctry() as session:
+        bars: Iterable[Dbbardata] = (await session.execute(
+            select(Dbbardata).where(
+                Dbbardata.symbol == symbol,
+                Dbbardata.exchange == exchange,
+                Dbbardata.interval == interval).order_by(Dbbardata.datetime.desc()).limit(max_bar_num)
+        )).scalars().all()
+
+        bars = sorted(bars, key=lambda item: item.datetime)
+        return bars

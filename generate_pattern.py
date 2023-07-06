@@ -1,10 +1,12 @@
 import asyncio
 import peewee
 import uvloop
+from sqlalchemy import select
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 from loguru import logger
-from orm import DbBarData, get_or_create_k_pattern_objects, KPattern, PatternRecognizeRecord
+from orm import DbBarData, get_or_create_k_pattern_objects, KPattern, PatternRecognizeRecord, Dbbardata, \
+    alrb_asess_fctry
 from pattern_calculator.pattern_calcltor_interface import PatternCalcltor
 from typing import Type, List
 from utilities import symbol_vnpy2united, VNPY_BN_INTERVAL_MAP
@@ -15,9 +17,6 @@ from concurrent.futures import ProcessPoolExecutor
 async def cal_and_record_pattern(pattern_calcltor_class: Type[PatternCalcltor],
                                  symbol_exchange_interval_bars: List[DbBarData]):
     """计算和存储K线的形态匹配结果"""
-    # K线匹配结果model objects
-    k_pattern_objects = await get_or_create_k_pattern_objects()
-
     # 计算过程的起始时间
     start = asyncio.get_running_loop().time()
     # 匹配结果
@@ -47,29 +46,32 @@ async def cal_and_record_pattern(pattern_calcltor_class: Type[PatternCalcltor],
             entry_datetime, start_datetime, matching_score = \
                 recognize_res['EntryTime'], recognize_res['StartTime'], recognize_res['MatchingScore']
             extra = {k: v for k, v in recognize_res.items() if k not in ['EntryTime', 'StartTime', 'MatchingScore']}
-            # 查询形态
-            k_pattern_task = asyncio.create_task(
-                k_pattern_objects.get(KPattern, KPattern.name == pattern_calcltor_class.name))
-            # 存储匹配结果
-            for symbol_exchange_interval_bar in symbol_exchange_interval_bars:
-                break
-            symbol_type, united_symbol = await symbol_vnpy2united(symbol_exchange_interval_bar.exchange,
-                                                                  symbol_exchange_interval_bar.symbol)
-            k_pattern = await k_pattern_task
-            try:
-                await k_pattern_objects.create(
-                    PatternRecognizeRecord,
-                    pattern_id=k_pattern.id,
-                    symbol_type=symbol_type,
-                    symbol=united_symbol,
-                    exchange=symbol_exchange_interval_bar.exchange,
-                    k_interval=VNPY_BN_INTERVAL_MAP[symbol_exchange_interval_bar.interval],
-                    match_score=matching_score,
-                    pattern_end=entry_datetime,
-                    pattern_start=start_datetime,
-                    extra=extra)
-            except peewee.IntegrityError:
-                pass
+            async with alrb_asess_fctry() as session:
+                # 查询形态
+                k_pattern_task = asyncio.create_task(await session.execute(
+                    select(KPattern).where(KPattern.name == str(pattern_calcltor_class.name)))).scalars().one()
+                # 存储匹配结果
+                for symbol_exchange_interval_bar in symbol_exchange_interval_bars:
+                    break
+                symbol_type, united_symbol = await symbol_vnpy2united(symbol_exchange_interval_bar.exchange,
+                                                                      symbol_exchange_interval_bar.symbol)
+                k_pattern = await k_pattern_task
+                async with session.begin():
+                    ...
+                    try:
+                        await k_pattern_objects.create(
+                            PatternRecognizeRecord,
+                            pattern_id=k_pattern.id,
+                            symbol_type=symbol_type,
+                            symbol=united_symbol,
+                            exchange=symbol_exchange_interval_bar.exchange,
+                            k_interval=VNPY_BN_INTERVAL_MAP[symbol_exchange_interval_bar.interval],
+                            match_score=matching_score,
+                            pattern_end=entry_datetime,
+                            pattern_start=start_datetime,
+                            extra=extra)
+                    except peewee.IntegrityError:
+                        pass
 
 
 async def cal_and_record_pattern_mul_pro(pattern_calcltor_class: Type[PatternCalcltor],
