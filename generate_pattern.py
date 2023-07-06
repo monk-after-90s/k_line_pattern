@@ -94,7 +94,7 @@ async def cal_and_record_pattern_mul_pro(pattern_calcltor_class: Type[PatternCal
                                                                      symbol_exchange_interval_bars)
 
     end = asyncio.get_running_loop().time()
-    getattr(logger, "info" if recognize_res is None else "success")(
+    getattr(logger, "success" if isinstance(recognize_res, dict) else "info")(
         beeprint.pp({
             "bar_briefing": f"{symbol_exchange_interval_bars[0].symbol} {symbol_exchange_interval_bars[0].exchange} {symbol_exchange_interval_bars[0].interval}",
             "pattern_calcltor_class": pattern_calcltor_class,
