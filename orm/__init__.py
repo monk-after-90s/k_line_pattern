@@ -1,5 +1,5 @@
 from .database import alrb_asess_fctry, bar_asess_fctry
-from .models import Dbbaroverview, Dbbardata, PatternRecognizeRecord, KPatternGroup, KPattern
+from .models import Dbbaroverview, Dbbardata, PatternRecognizeRecord, KPattern
 
 import asyncio
 
