@@ -10,7 +10,6 @@ peewee-async==0.8.1
 PyMySQL==1.0.3
 scikit-learn==1.2.2
 scipy==1.10.1
-SQLAlchemy==2.0.17
 uvloop==0.17.0
 vnpy==3.6.0
 vnpy-binance-pro==2023.6.20.1
