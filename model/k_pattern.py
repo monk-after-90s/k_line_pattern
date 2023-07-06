@@ -64,5 +64,5 @@ class PatternRecognizeRecord(BaseModel):
     class Meta:
         table_name = 'pattern_recognize_record'
         indexes = (
-            (('pattern_id', 'symbol_type', 'symbol', 'k_interval', 'pattern_start', 'pattern_end'), True),
+            (('pattern_id', 'exchange', 'symbol_type', 'symbol', 'k_interval', 'pattern_start', 'pattern_end'), True),
         )
