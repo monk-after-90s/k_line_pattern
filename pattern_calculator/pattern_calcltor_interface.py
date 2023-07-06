@@ -1,9 +1,7 @@
 from typing import Callable, Iterable
 
-import beeprint
-from loguru import logger
 from playhouse.shortcuts import model_to_dict
-from orm import DbBarData
+from orm import Dbbardata
 from abc import ABC
 import pandas as pd
 
@@ -21,11 +19,11 @@ class PatternCalcltor(ABC):
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def calculate(self, bars: Iterable[DbBarData]):
+    def calculate(self, bars: Iterable[Dbbardata]):
         bar_df = pd.DataFrame(
             sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
 
-#         logger.debug(
+        #         logger.debug(
         #             f"""
         # pattern_calcltor_class={type(self)}
         # bar_df=
@@ -39,7 +37,7 @@ class PatternCalcltor(ABC):
 class PatternCalcltorWithInterval(PatternCalcltor):
     """带有interval参数的形态计算器"""
 
-    def calculate(self, bars: Iterable[DbBarData]):
+    def calculate(self, bars: Iterable[Dbbardata]):
         # K线间隔
         intervals = list({bar.interval for bar in bars})
         assert len(intervals) == 1

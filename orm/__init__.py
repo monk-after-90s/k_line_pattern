@@ -3,8 +3,7 @@ from .models import Dbbaroverview, Dbbardata, PatternRecognizeRecord, KPatternGr
 
 import asyncio
 
-from .bar import get_or_create_bar_objects, DbBarData, DbBarOverview
-from .k_pattern import get_or_create_k_pattern_objects
+from .bar import DbBarData
 
 
 async def close_objects():
