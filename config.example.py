@@ -11,6 +11,6 @@ DB_HOST1 = "localhost"
 DB_PORT1 = 3306
 DB_USER1 = "user"
 DB_PASSWD1 = "123456"
-DB1 = "quant-test"
+DB1 = "quant"
 # 形态识别的K线interval，遵循vnpy标准
 INTERVALS = ["d", "4h", "1h", "30m"]
