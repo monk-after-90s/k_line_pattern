@@ -18,9 +18,6 @@ from model import get_or_create_k_pattern_objects, PatternRecognizeRecord, get_o
 from utilities import INTERVAL_SECS_MAP as interval_secs_map
 from concurrent.futures import ProcessPoolExecutor
 from pattern_calculator import pattern_calcltor_classes
-from config import SEMAPHORE_VALUE
-
-sem = asyncio.Semaphore(SEMAPHORE_VALUE)
 
 
 def main():
@@ -171,10 +168,11 @@ async def handle_symbol_interval(symbol,
             if init_bar_datetime is not None and init_bar_datetime > datetime.now():
                 break
             # 计算并存储pattern_calcltor值
+            tasks = []
             for pattern_calcltor_class in pattern_calcltor_classes:
-                # 信号量控制并发
-                await sem.acquire()
-                asyncio.create_task(cal_and_record_pattern_mul_pro(pattern_calcltor_class, bars, executor, sem))
+                tasks.append(
+                    asyncio.create_task(cal_and_record_pattern_mul_pro(pattern_calcltor_class, bars, executor)))
+            [await task for task in tasks]
 
             # datetime步进
             init_bar_datetime += timedelta(seconds=interval_secs_map[interval])

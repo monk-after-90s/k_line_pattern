@@ -14,5 +14,3 @@ DB_PASSWD1 = "123456"
 DB1 = "quant"
 # 形态识别的K线interval，遵循vnpy标准
 INTERVALS = ["d", "4h", "1h", "30m"]
-# 信号量并发量
-SEMAPHORE_VALUE = 20
