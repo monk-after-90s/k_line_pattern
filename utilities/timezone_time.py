@@ -11,7 +11,7 @@ class TimestampWithTimezone(TypeDecorator):
     def process_result_value(self, value: datetime, dialect):
         if value is not None:
             # 将结果值转换为带时区的 datetime 对象
-            value = convert_to_utc(value)
+            value = convert_to_sh(value)
         return value
 
 
