@@ -1,6 +1,5 @@
 from typing import Callable, Iterable
 
-from playhouse.shortcuts import model_to_dict
 from orm import Dbbardata
 from abc import ABC
 import pandas as pd
@@ -21,7 +20,7 @@ class PatternCalcltor(ABC):
 
     def calculate(self, bars: Iterable[Dbbardata]):
         bar_df = pd.DataFrame(
-            sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
+            sorted([bar.to_dict() for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
 
         #         logger.debug(
         #             f"""
@@ -43,6 +42,6 @@ class PatternCalcltorWithInterval(PatternCalcltor):
         assert len(intervals) == 1
         # bar Dataframe
         bar_df = pd.DataFrame(
-            sorted([model_to_dict(bar) for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
+            sorted([bar.to_dict() for bar in bars], key=lambda i: i['datetime'])[-self.bar_num:])
 
         return type(self).cal_func(bar_df, intervals[0])

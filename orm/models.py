@@ -95,6 +95,10 @@ class Dbbardata(Base):
     close_price = mapped_column(Float, nullable=False)
     is_checked = mapped_column(TINYINT(1), server_default=text("'0'"), comment='是否已经检查过')
 
+    def to_dict(self):
+        """转化为字典表达"""
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 class Dbbaroverview(Base):
     __tablename__ = 'dbbaroverview'
