@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from functools import partial
 from typing import List
 import beeprint
+import pytz
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy import select
 from apscheduler_job import set_scheduler
@@ -14,10 +15,10 @@ from realtime_recognize import job
 from utilities import handle_sigterm, symbol_vnpy2united, VNPY_BN_INTERVAL_MAP
 from loguru import logger
 from orm import PatternRecognizeRecord, Dbbaroverview, bar_asess_fctry, alrb_asess_fctry, Dbbardata, close_engines
-from utilities import INTERVAL_SECS_MAP as interval_secs_map
+from utilities import INTERVAL_SECS_MAP as interval_secs_map, convert_to_sh
 from concurrent.futures import ProcessPoolExecutor
 from pattern_calculator import pattern_calcltor_classes
-from config import SEMAPHORE_VALUE
+from config import SEMAPHORE_VALUE, TIMEZONE
 
 sem = asyncio.Semaphore(SEMAPHORE_VALUE)
 
@@ -174,7 +175,8 @@ async def handle_symbol_interval(symbol: str,
                 return
             else:
                 # 查bar查到了现在
-                if init_bar_datetime is not None and init_bar_datetime > datetime.now():
+                if init_bar_datetime is not None and convert_to_sh(init_bar_datetime) > pytz.timezone(
+                        TIMEZONE).localize(datetime.now()):
                     break
                 # 计算并存储pattern_calcltor值
                 for pattern_calcltor_class in pattern_calcltor_classes:
