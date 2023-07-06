@@ -32,16 +32,20 @@ async def gracefully_exit():
     print(f"gracefully_exit")
 
 
-async def flush():
+async def flush(executor: ProcessPoolExecutor):
     """填充历史形态记录"""
     # 查找续接日期
-    newest_record_dt: datetime = await (await get_or_create_k_pattern_objects()).scalar(
+    newest_record_dt: datetime | None = await (await get_or_create_k_pattern_objects()).scalar(
         PatternRecognizeRecord.select(fn.MAX(PatternRecognizeRecord.pattern_end)))
-    if newest_record_dt is None:
-        # 第一根K线
-        newest_record_dt: datetime = await (await get_or_create_bar_objects()).scalar(
-            DbBarOverview.select(fn.Min(DbBarOverview.start)))
-    pass
+    if newest_record_dt is not None:
+        newest_record_dt = convert_to_sh(newest_record_dt)
+    # 分周期处理
+    if INTERVALS: await asyncio.wait(
+        [asyncio.create_task(handle_interval(newest_record_dt, INTERVAL, executor)) for INTERVAL in INTERVALS])
+
+
+async def handle_interval(init_datetime: datetime | None, interval: str, executor: ProcessPoolExecutor):
+    """处理单个周期"""
 
 
 if __name__ == '__main__':
