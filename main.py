@@ -13,7 +13,7 @@ from generate_pattern import cal_and_record_pattern_mul_pro
 from realtime_recognize import job
 from utilities import handle_sigterm, symbol_vnpy2united, VNPY_BN_INTERVAL_MAP
 from loguru import logger
-from orm import PatternRecognizeRecord, Dbbaroverview, bar_asess_fctry, alrb_asess_fctry, Dbbardata
+from orm import PatternRecognizeRecord, Dbbaroverview, bar_asess_fctry, alrb_asess_fctry, Dbbardata, close_engines
 from utilities import INTERVAL_SECS_MAP as interval_secs_map
 from concurrent.futures import ProcessPoolExecutor
 from pattern_calculator import pattern_calcltor_classes
@@ -48,7 +48,7 @@ def main():
 
 async def gracefully_exit():
     """优雅退出"""
-    print(f"gracefully_exit")
+    await close_engines()
 
 
 async def flush(executor: ProcessPoolExecutor, aioscheduler: AsyncIOScheduler):

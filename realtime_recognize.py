@@ -7,7 +7,7 @@ from apscheduler_job import set_scheduler
 from pattern_bars import query_newest_bars
 from pattern_calculator import pattern_calcltor_classes
 from apscheduler_job import interval_filter
-from orm import close_objects
+from orm import close_engines
 import beeprint
 import signal
 import os
@@ -62,7 +62,7 @@ signal.signal(signal.SIGTERM, handle_sigterm)
 
 async def gracefully_exit():
     """优雅退出"""
-    await close_objects()
+    await close_engines()
 
 
 def main():
