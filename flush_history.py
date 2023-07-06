@@ -67,6 +67,8 @@ async def flush(executor: ProcessPoolExecutor, aioscheduler: AsyncIOScheduler):
 
     await asyncio.gather(*handle_interval_tasks)
 
+    logger.success("填充历史形态记录 完成")
+
 
 async def handle_interval(interval: str, executor: ProcessPoolExecutor, interval_last_record_e: asyncio.Event):
     """
