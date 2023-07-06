@@ -8,6 +8,7 @@ from apscheduler.triggers.cron import CronTrigger
 from config import INTERVALS
 from utilities import INTERVAL_SECS_MAP as interval_secs_map
 from apscheduler.util import undefined
+from utilities import find_gcd
 
 schedule_interval = float('inf')
 
@@ -18,8 +19,7 @@ def interval_to_cron_triggers():
 
     # 计算最小间隔秒数
     global schedule_interval
-    schedule_interval = min(
-        interval_secs_map[INTERVAL] for INTERVAL in INTERVALS)  # todo 使用utilities.find_gcd找到各周期的最大公约数作为定时间隔而不是最小的周期
+    schedule_interval = find_gcd([interval_secs_map[INTERVAL] for INTERVAL in INTERVALS])
     if schedule_interval < 3600:
         for i in range(3600 // schedule_interval):
             triggers.append(CronTrigger(minute=int(((i + 0.5) * schedule_interval) // 60)))
