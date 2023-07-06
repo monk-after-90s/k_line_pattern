@@ -3,10 +3,11 @@ import asyncio
 import os
 from datetime import datetime, timedelta
 from typing import Iterable, List
+import beeprint
 from peewee import fn
 from config import INTERVALS
 from generate_pattern import cal_and_record_pattern_mul_pro
-from utilities import handle_sigterm
+from utilities import handle_sigterm, symbol_vnpy2united, VNPY_BN_INTERVAL_MAP
 from loguru import logger
 from model import get_or_create_k_pattern_objects, PatternRecognizeRecord, get_or_create_bar_objects, DbBarOverview, \
     DbBarData
@@ -70,9 +71,79 @@ async def handle_interval(interval: str, executor: ProcessPoolExecutor):
 async def handle_symbol_interval(symbol,
                                  exchange,
                                  interval,
-                                 init_bar_datetime: None | datetime,
                                  executor: ProcessPoolExecutor):
     """处理单个symbol的单个interval的K线序列"""
+    bar_objects = await get_or_create_bar_objects()
+
+    # 格式转换
+    symbol_type, united_symbol = await asyncio.create_task(symbol_vnpy2united(exchange,
+                                                                              symbol))
+    # 查找续接日期
+    newest_record_dt: datetime | None = await (await get_or_create_k_pattern_objects()).scalar(
+        PatternRecognizeRecord.select(fn.Max(PatternRecognizeRecord.pattern_end)).where(
+            (PatternRecognizeRecord.exchange == exchange) &
+            (PatternRecognizeRecord.symbol_type == symbol_type) &
+            (PatternRecognizeRecord.symbol == united_symbol) &
+            (PatternRecognizeRecord.k_interval == VNPY_BN_INTERVAL_MAP[interval])))
+    if newest_record_dt is not None:
+        newest_record_dt = convert_to_sh(newest_record_dt)
+
+    # 修剪起始datetime使其刚好符合interval
+    interval_secs = interval_secs_map[interval]
+    if newest_record_dt is not None:
+        init_bar_datetime: datetime | None = datetime.fromtimestamp(
+            newest_record_dt.timestamp() - newest_record_dt.timestamp() % interval_secs,
+            tz=pytz.timezone(TIMEZONE))
+        # 不要时区
+        init_bar_datetime = init_bar_datetime.replace(tzinfo=None)
+    else:
+        # 柱子的初始datetime
+        init_bar_datetime: datetime = await bar_objects.scalar(DbBarData.select(fn.Min(DbBarData.datetime)))
+        if init_bar_datetime is None:
+            logger.error(beeprint.pp({
+                "msg": "没有K线",
+                "symbol": symbol,
+                "exchange": exchange,
+                "interval": interval
+            }, output=False, sort_keys=False))
+            return
+
+    # 需要的最大的Kline Bar数量
+    max_bar_num: int = max(pattern_calcltor_class.bar_num for pattern_calcltor_class in pattern_calcltor_classes)
+
+    # 查询、计算、存储循环
+    while True:
+        # 查bars
+        bars: List[DbBarData] = sorted(await bar_objects.execute(
+            DbBarData.select().where((DbBarData.symbol == symbol) &
+                                     (DbBarData.exchange == exchange) &
+                                     (DbBarData.interval == interval) &
+                                     (DbBarData.datetime <= init_bar_datetime)).
+            order_by(DbBarData.datetime.desc()).limit(max_bar_num)
+        ), key=lambda item: item.datetime)
+
+        if not bars:
+            logger.error(beeprint.pp({
+                "msg": "没有K线",
+                "symbol": symbol,
+                "exchange": exchange,
+                "interval": interval
+            }, output=False, sort_keys=False))
+            return
+        else:
+            # 查bar查到了底
+            if init_bar_datetime is not None and init_bar_datetime > bars[-1].datetime:
+                ...
+                # todo
+            # 计算并存储pattern_calcltor值
+            tasks = []
+            for pattern_calcltor_class in pattern_calcltor_classes:
+                tasks.append(
+                    asyncio.create_task(cal_and_record_pattern_mul_pro(pattern_calcltor_class, bars, executor)))
+            [await task for task in tasks]
+
+            # datetime步进
+            init_bar_datetime += timedelta(seconds=interval_secs_map[interval])
 
 
 if __name__ == '__main__':
