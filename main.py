@@ -11,10 +11,12 @@ from model import close_objects
 import beeprint
 import signal
 import os
-from generate_pattern import cal_and_record_pattern
+from generate_pattern import cal_and_record_pattern_mul_pro
+from concurrent.futures import ProcessPoolExecutor
+from functools import partial
 
 
-async def job():
+async def job(executor: ProcessPoolExecutor):
     """
     单次调度任务
 
@@ -40,8 +42,8 @@ async def job():
     for pattern_calcltor_class in pattern_calcltor_classes:
         # 将bars给pattern_calcltor消化
         for symbol_exchange_interval_bars in symbol_exchange_interval_barses:
-            tasks.append(
-                asyncio.create_task(cal_and_record_pattern(pattern_calcltor_class, symbol_exchange_interval_bars)))
+            tasks.append(asyncio.create_task(
+                cal_and_record_pattern_mul_pro(pattern_calcltor_class, symbol_exchange_interval_bars, executor)))
 
     [await task for task in tasks]
 
@@ -71,14 +73,17 @@ def main():
     global loop
     # 事件循环
     loop = asyncio.get_event_loop()
+    # 多进程执行器
+    executor = ProcessPoolExecutor()
     # 异步定时器
-    aioscheduler = set_scheduler(job, loop)
+    aioscheduler = set_scheduler(partial(job, executor), loop)
     try:
         loop.run_forever()
     finally:
         logger.info(f"Start gracefully exit")
         aioscheduler.shutdown()
         loop.run_until_complete(gracefully_exit())
+        executor.shutdown()
         logger.info(f"Finish gracefully exit")
 
 
