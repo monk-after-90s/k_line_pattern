@@ -20,7 +20,7 @@ class SoftLogicDelAsyncSession(AsyncSession):
 
 
 # alpha_rabit数据库 创建异步SQLAlchemy引擎
-alpha_rabit_engine1: AsyncEngine = create_async_engine(
+alpha_rabit_engine: AsyncEngine = create_async_engine(
     URL.create("mysql+aiomysql",
                config.DB_USER,
                config.DB_PASSWD,
@@ -29,7 +29,7 @@ alpha_rabit_engine1: AsyncEngine = create_async_engine(
                config.DB),
     echo=True)
 # alpha_rabit数据库的会话工厂
-alrb_asess_fctry = async_sessionmaker(alpha_rabit_engine1, expire_on_commit=False, class_=SoftLogicDelAsyncSession)
+alrb_asess_fctry = async_sessionmaker(alpha_rabit_engine, expire_on_commit=False, class_=SoftLogicDelAsyncSession)
 
 # 查询K线的数据库 创建异步SQLAlchemy引擎
 bar_engine: AsyncEngine = create_async_engine(
