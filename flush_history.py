@@ -2,19 +2,20 @@
 import asyncio
 import os
 from datetime import datetime, timedelta
+from functools import partial
 from typing import Iterable, List
 import beeprint
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from peewee import fn
+from apscheduler_job import set_scheduler
 from config import INTERVALS
 from generate_pattern import cal_and_record_pattern_mul_pro
+from main import job
 from utilities import handle_sigterm, symbol_vnpy2united, VNPY_BN_INTERVAL_MAP
 from loguru import logger
 from model import get_or_create_k_pattern_objects, PatternRecognizeRecord, get_or_create_bar_objects, DbBarOverview, \
     DbBarData
 from utilities import INTERVAL_SECS_MAP as interval_secs_map
-import pytz
-from config import TIMEZONE
-from utilities import convert_to_sh
 from concurrent.futures import ProcessPoolExecutor
 from pattern_calculator import pattern_calcltor_classes
 
@@ -29,12 +30,15 @@ def main():
     handle_sigterm(loop)
     # 多进程执行器
     executor = ProcessPoolExecutor()
+    # 异步定时器
+    aioscheduler: AsyncIOScheduler = set_scheduler(partial(job, executor), loop)
     # 添加任务
-    loop.create_task(flush(executor))
+    loop.create_task(flush(executor, aioscheduler))
     try:
         loop.run_forever()
     finally:
         logger.info(f"Start gracefully exit")
+        aioscheduler.shutdown()
         loop.run_until_complete(gracefully_exit())
         executor.shutdown()
         logger.info(f"Finish gracefully exit")
@@ -45,34 +49,66 @@ async def gracefully_exit():
     print(f"gracefully_exit")
 
 
-async def flush(executor: ProcessPoolExecutor):
+async def flush(executor: ProcessPoolExecutor, aioscheduler: AsyncIOScheduler):
     """填充历史形态记录"""
+    interval_last_record_es = []
+    handle_interval_tasks = []
     # 分周期处理
-    if INTERVALS: await asyncio.wait(
-        [asyncio.create_task(handle_interval(INTERVAL, executor)) for INTERVAL in INTERVALS])
+    for INTERVAL in INTERVALS:
+        interval_last_record_e = asyncio.Event()
+        handle_interval_tasks.append(
+            asyncio.create_task(handle_interval(INTERVAL, executor, interval_last_record_e)))
+        interval_last_record_es.append(interval_last_record_e)
+    # 等待所有周期查询完续接日期的事件
+    await asyncio.gather(*(interval_last_record_e.wait() for interval_last_record_e in interval_last_record_es))
+    # 启动实时形态匹配
+    logger.info("启动实时形态匹配")
+    aioscheduler.start()
+
+    await asyncio.gather(*handle_interval_tasks)
 
 
-async def handle_interval(interval: str, executor: ProcessPoolExecutor):
-    """处理单个周期"""
+async def handle_interval(interval: str, executor: ProcessPoolExecutor, interval_last_record_e: asyncio.Event):
+    """
+    处理单个周期
+
+    interval_last_record_e: 整个周期查询完续接日期的事件
+    """
     # 获取symbol配置，分配任务
     bar_objects = await get_or_create_bar_objects()
     # 获取symbol配置
     bar_configs: Iterable[DbBarOverview] = await bar_objects.execute(
         DbBarOverview.select().where(DbBarOverview.interval == interval))
-
-    return await asyncio.gather(
-        *(handle_symbol_interval(bar_config.symbol,
-                                 bar_config.exchange,
-                                 bar_config.interval,
-                                 executor)
-          for bar_config in bar_configs))
+    # 查询PatternRecognizeRecord最后日期结束的事件 列表
+    last_record_es = []
+    handle_symbol_interval_tasks = []
+    for bar_config in bar_configs:
+        last_record_e = asyncio.Event()
+        handle_symbol_interval_tasks.append(
+            asyncio.create_task(
+                handle_symbol_interval(bar_config.symbol,
+                                       bar_config.exchange,
+                                       bar_config.interval,
+                                       executor,
+                                       last_record_e)))
+        last_record_es.append(last_record_e)
+    # 等待全部"查找续接日期"完成
+    await asyncio.gather(*(last_record_e.wait() for last_record_e in last_record_es))
+    # 触发整个周期查询完续接日期的事件
+    interval_last_record_e.set()
+    return await asyncio.gather(*handle_symbol_interval_tasks)
 
 
 async def handle_symbol_interval(symbol,
                                  exchange,
                                  interval,
-                                 executor: ProcessPoolExecutor):
-    """处理单个symbol的单个interval的K线序列"""
+                                 executor: ProcessPoolExecutor,
+                                 last_record_e: asyncio.Event):
+    """
+    处理单个symbol的单个interval的K线序列
+
+    last_record_e: 查询PatternRecognizeRecord最后日期结束的事件
+    """
     bar_objects = await get_or_create_bar_objects()
 
     # 格式转换
@@ -85,6 +121,9 @@ async def handle_symbol_interval(symbol,
             (PatternRecognizeRecord.symbol_type == symbol_type) &
             (PatternRecognizeRecord.symbol == united_symbol) &
             (PatternRecognizeRecord.k_interval == VNPY_BN_INTERVAL_MAP[interval])))
+    # 查询PatternRecognizeRecord最后日期完成
+    last_record_e.set()
+
     if init_bar_datetime is None:
         # 柱子的初始datetime
         init_bar_datetime: datetime = await bar_objects.scalar(
