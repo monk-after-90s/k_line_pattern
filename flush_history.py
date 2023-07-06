@@ -46,26 +46,13 @@ async def gracefully_exit():
 
 async def flush(executor: ProcessPoolExecutor):
     """填充历史形态记录"""
-    # 查找续接日期
-    newest_record_dt: datetime | None = await (await get_or_create_k_pattern_objects()).scalar(
-        PatternRecognizeRecord.select(fn.Max(PatternRecognizeRecord.pattern_end)))
-    if newest_record_dt is not None:
-        newest_record_dt = convert_to_sh(newest_record_dt)
     # 分周期处理
     if INTERVALS: await asyncio.wait(
-        [asyncio.create_task(handle_interval(newest_record_dt, INTERVAL, executor)) for INTERVAL in INTERVALS])
+        [asyncio.create_task(handle_interval(INTERVAL, executor)) for INTERVAL in INTERVALS])
 
 
-async def handle_interval(init_datetime: datetime | None, interval: str, executor: ProcessPoolExecutor):
+async def handle_interval(interval: str, executor: ProcessPoolExecutor):
     """处理单个周期"""
-    # 修剪起始datetime使其刚好符合interval
-    interval_secs = interval_secs_map[interval]
-    if init_datetime is not None:
-        init_bar_datetime = datetime.fromtimestamp(
-            init_datetime.timestamp() - init_datetime.timestamp() % interval_secs,
-            tz=pytz.timezone(TIMEZONE))
-    else:
-        init_bar_datetime = None
     # 获取symbol配置，分配任务
     bar_objects = await get_or_create_bar_objects()
     # 获取symbol配置
@@ -76,7 +63,6 @@ async def handle_interval(init_datetime: datetime | None, interval: str, executo
         *(handle_symbol_interval(bar_config.symbol,
                                  bar_config.exchange,
                                  bar_config.interval,
-                                 init_bar_datetime,
                                  executor)
           for bar_config in bar_configs))
 
