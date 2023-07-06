@@ -1,12 +1,12 @@
 # 时区 不能改动!
 TIMEZONE = "Asia/Shanghai"
-# db0
+# db0 存储形态匹配记录
 DB_HOST = "localhost"
 DB_PORT = 3306
 DB_USER = "user"
 DB_PASSWD = "123456"
 DB = "alpha_rabit_dev"
-# db1
+# db1 查询K线
 DB_HOST1 = "localhost"
 DB_PORT1 = 3306
 DB_USER1 = "user"
