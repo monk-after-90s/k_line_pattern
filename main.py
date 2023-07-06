@@ -64,6 +64,7 @@ async def gracefully_exit():
 
 
 def main():
+    logger.warning(f"请手动确保运行在了东八区")
     if os.environ.get("PYTHONUNBUFFERED") == "1":
         logger.info(f"development mode")
 
