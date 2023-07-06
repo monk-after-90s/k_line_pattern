@@ -98,7 +98,10 @@ async def handle_symbol_interval(symbol,
         init_bar_datetime = init_bar_datetime.replace(tzinfo=None)
     else:
         # 柱子的初始datetime
-        init_bar_datetime: datetime = await bar_objects.scalar(DbBarData.select(fn.Min(DbBarData.datetime)))
+        init_bar_datetime: datetime = await bar_objects.scalar(
+            DbBarData.select(fn.Min(DbBarData.datetime)).where((DbBarData.symbol == symbol) &
+                                                               (DbBarData.exchange == exchange) &
+                                                               (DbBarData.interval == interval)))
         if init_bar_datetime is None:
             logger.error(beeprint.pp({
                 "msg": "没有K线",
