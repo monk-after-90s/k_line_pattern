@@ -1,3 +1,5 @@
+from .database import alrb_asess_fctry, bar_asess_fctry
+
 import asyncio
 
 from .bar import get_or_create_bar_objects, DbBarData, DbBarOverview
