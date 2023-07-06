@@ -79,24 +79,13 @@ async def handle_symbol_interval(symbol,
     symbol_type, united_symbol = await asyncio.create_task(symbol_vnpy2united(exchange,
                                                                               symbol))
     # 查找续接日期
-    newest_record_dt: datetime | None = await (await get_or_create_k_pattern_objects()).scalar(
+    init_bar_datetime: datetime | None = await (await get_or_create_k_pattern_objects()).scalar(
         PatternRecognizeRecord.select(fn.Max(PatternRecognizeRecord.pattern_end)).where(
             (PatternRecognizeRecord.exchange == exchange) &
             (PatternRecognizeRecord.symbol_type == symbol_type) &
             (PatternRecognizeRecord.symbol == united_symbol) &
             (PatternRecognizeRecord.k_interval == VNPY_BN_INTERVAL_MAP[interval])))
-    if newest_record_dt is not None:
-        newest_record_dt = convert_to_sh(newest_record_dt)
-
-    # 修剪起始datetime使其刚好符合interval
-    interval_secs = interval_secs_map[interval]
-    if newest_record_dt is not None:
-        init_bar_datetime: datetime | None = datetime.fromtimestamp(
-            newest_record_dt.timestamp() - newest_record_dt.timestamp() % interval_secs,
-            tz=pytz.timezone(TIMEZONE))
-        # 不要时区
-        init_bar_datetime = init_bar_datetime.replace(tzinfo=None)
-    else:
+    if init_bar_datetime is None:
         # 柱子的初始datetime
         init_bar_datetime: datetime = await bar_objects.scalar(
             DbBarData.select(fn.Min(DbBarData.datetime)).where((DbBarData.symbol == symbol) &
