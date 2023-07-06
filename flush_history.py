@@ -162,8 +162,8 @@ async def handle_symbol_interval(symbol,
             }, output=False, sort_keys=False))
             return
         else:
-            # 查bar查到了底
-            if init_bar_datetime is not None and init_bar_datetime > bars[-1].datetime:
+            # 查bar查到了现在
+            if init_bar_datetime is not None and init_bar_datetime > datetime.now():
                 break
             # 计算并存储pattern_calcltor值
             tasks = []
