@@ -135,7 +135,9 @@ async def cal_and_record_pattern_mul_pro(pattern_calcltor_class: Type[PatternCal
                         pattern_end=entry_datetime,
                         pattern_start=start_datetime,
                         extra=extra)
-                except peewee.IntegrityError:
-                    pass
+                except peewee.IntegrityError as e:
+                    logger.error("存PatternRecognizeRecord报错:\n" + beeprint.pp(e,
+                                                                                 output=False,
+                                                                                 sort_keys=False))
     finally:
         sem.release()
