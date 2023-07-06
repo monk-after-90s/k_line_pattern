@@ -10,7 +10,7 @@ from peewee import fn
 from apscheduler_job import set_scheduler
 from config import INTERVALS
 from generate_pattern import cal_and_record_pattern_mul_pro
-from main import job
+from realtime_recognize import job
 from utilities import handle_sigterm, symbol_vnpy2united, VNPY_BN_INTERVAL_MAP
 from loguru import logger
 from model import get_or_create_k_pattern_objects, PatternRecognizeRecord, get_or_create_bar_objects, DbBarOverview, \
