@@ -44,7 +44,7 @@ def interval_filter():
     return filtered_intervals
 
 
-def set_scheduler(job: Callable, event_loop: asyncio.get_event_loop()):
+def set_scheduler(job: Callable, event_loop: asyncio.get_event_loop(), start=False):
     """setup scheduler"""
     # 定时任务
     scheduler = AsyncIOScheduler(event_loop=event_loop)
@@ -61,7 +61,8 @@ def set_scheduler(job: Callable, event_loop: asyncio.get_event_loop()):
             next_run_time=datetime.datetime.now() + datetime.timedelta(seconds=1)
             if os.environ.get("PYTHONUNBUFFERED") == "1" and not next_run_time_set else undefined)
         next_run_time_set = True
-    scheduler.start()
+    if start:
+        scheduler.start()
     return scheduler
 
 
