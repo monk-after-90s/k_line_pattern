@@ -13,7 +13,7 @@ from generate_pattern import cal_and_record_pattern_mul_pro
 from realtime_recognize import job
 from utilities import handle_sigterm, symbol_vnpy2united, VNPY_BN_INTERVAL_MAP
 from loguru import logger
-from model import get_or_create_k_pattern_objects, PatternRecognizeRecord, get_or_create_bar_objects, DbBarOverview, \
+from orm import get_or_create_k_pattern_objects, PatternRecognizeRecord, get_or_create_bar_objects, DbBarOverview, \
     DbBarData
 from utilities import INTERVAL_SECS_MAP as interval_secs_map
 from concurrent.futures import ProcessPoolExecutor

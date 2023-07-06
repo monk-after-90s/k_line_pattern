@@ -3,7 +3,7 @@ from typing import Callable, Iterable
 import beeprint
 from loguru import logger
 from playhouse.shortcuts import model_to_dict
-from model import DbBarData
+from orm import DbBarData
 from abc import ABC
 import pandas as pd
 

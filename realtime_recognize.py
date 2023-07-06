@@ -7,7 +7,7 @@ from apscheduler_job import set_scheduler
 from pattern_bars import query_newest_bars
 from pattern_calculator import pattern_calcltor_classes
 from apscheduler_job import interval_filter
-from model import close_objects
+from orm import close_objects
 import beeprint
 import signal
 import os

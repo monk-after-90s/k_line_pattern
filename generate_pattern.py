@@ -4,7 +4,7 @@ import uvloop
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 from loguru import logger
-from model import DbBarData, get_or_create_k_pattern_objects, KPattern, PatternRecognizeRecord
+from orm import DbBarData, get_or_create_k_pattern_objects, KPattern, PatternRecognizeRecord
 from pattern_calculator.pattern_calcltor_interface import PatternCalcltor
 from typing import Type, List
 from utilities import symbol_vnpy2united, VNPY_BN_INTERVAL_MAP

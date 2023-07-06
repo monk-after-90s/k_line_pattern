@@ -1,6 +1,6 @@
 import asyncio
 from typing import Iterable, List
-from model import get_or_create_bar_objects, DbBarData, DbBarOverview
+from orm import get_or_create_bar_objects, DbBarData, DbBarOverview
 from pattern_calculator import pattern_calcltor_classes
 
 
