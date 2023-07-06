@@ -156,13 +156,13 @@ async def handle_symbol_interval(symbol: str,
         # 查询、计算、存储循环
         while True:
             # 查bars
-            bars: List[Dbbardata] = sorted(await session.execute(
+            bars: List[Dbbardata] = sorted((await session.execute(
                 select(Dbbardata).where(Dbbardata.symbol == symbol,
                                         Dbbardata.exchange == exchange,
                                         Dbbardata.interval == interval,
                                         Dbbardata.datetime <= init_bar_datetime).
                 order_by(Dbbardata.datetime.desc()).limit(max_bar_num)
-            ), key=lambda item: item.datetime)
+            )).scalars().all(), key=lambda item: item.datetime)
 
             if not bars:
                 logger.error(beeprint.pp({
