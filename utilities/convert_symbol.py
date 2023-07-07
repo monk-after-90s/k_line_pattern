@@ -112,7 +112,7 @@ async def symbol_vnpy2united(exchange: str, vnpy_symbol: str, init=False):
 
 async def symbol_united2vnpy(exchange: str, symbol_type: str, united_symbol: str, init=False):
     """
-    通用symbol到vnpy symbol fixme 测试
+    通用symbol到vnpy symbol
 
     :return: vnpy symbol如btcusdt，表示币安现货的BTC/USDT
     """

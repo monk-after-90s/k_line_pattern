@@ -34,7 +34,7 @@ class ThreeWavesUpCalcltor(PatternCalcltor):
     name = "三浪上涨"
     _three_waves_up_inss = defaultdict(lambda: Exchange(ThreeWavesUp))
 
-    bar_num = 1  # todo 可以处理历史数据
+    bar_num = 1
 
     @classmethod
     def cal_func(cls, bar_df: DataFrame):
@@ -58,7 +58,7 @@ class ThreeWavesDownCalcltor(PatternCalcltor):
     name = "三浪下跌"
     _three_waves_down_inss = defaultdict(lambda: Exchange(ThreeWavesDown))
 
-    bar_num = 1  # todo 可以处理历史数据
+    bar_num = 1
 
     @classmethod
     def cal_func(cls, bar_df: DataFrame):
@@ -80,7 +80,7 @@ class ThreeWavesDownCalcltor(PatternCalcltor):
 
 class XiangTiZhengLiCalcltor(PatternCalcltorWithInterval):
     name = "箱体震荡"
-    bar_num = 35  # todo 可以处理历史数据
+    bar_num = 35
 
     @classmethod
     def cal_func(cls, bar_df: DataFrame, interval: str):
