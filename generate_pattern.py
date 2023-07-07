@@ -1,6 +1,6 @@
 import asyncio
 import uvloop
-from sqlalchemy import select
+from sqlalchemy import select, insert
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 from loguru import logger
@@ -66,8 +66,8 @@ async def cal_and_record_pattern_mul_pro(pattern_calcltor_class: Type[PatternCal
                 async with alrb_asess_fctry() as session:
                     try:
                         async with session.begin():
-                            session.add(
-                                PatternRecognizeRecord(
+                            await session.execute(
+                                insert(PatternRecognizeRecord).values(
                                     patternId=k_pattern.id,
                                     symbol_type=symbol_type,
                                     symbol=united_symbol,
@@ -77,7 +77,19 @@ async def cal_and_record_pattern_mul_pro(pattern_calcltor_class: Type[PatternCal
                                     patternEnd=entry_datetime,
                                     patternStart=start_datetime,
                                     extra=extra
-                                ))
+                                ).prefix_with('IGNORE'))
+                            # session.add(
+                            #     PatternRecognizeRecord(
+                            #         patternId=k_pattern.id,
+                            #         symbol_type=symbol_type,
+                            #         symbol=united_symbol,
+                            #         exchange=symbol_exchange_interval_bar.exchange,
+                            #         kInterval=VNPY_BN_INTERVAL_MAP[symbol_exchange_interval_bar.interval],
+                            #         matchScore=matching_score,
+                            #         patternEnd=entry_datetime,
+                            #         patternStart=start_datetime,
+                            #         extra=extra
+                            #     ))
                     except Exception as e:
                         logger.error("存PatternRecognizeRecord报错:\n" + beeprint.pp(e, output=False, sort_keys=False))
     finally:
