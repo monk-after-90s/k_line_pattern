@@ -16,3 +16,5 @@ venv*
 config_k_line.ipynb
 config.py
 test*.py
+.run
+log
