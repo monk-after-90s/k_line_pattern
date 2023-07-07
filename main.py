@@ -54,6 +54,7 @@ async def gracefully_exit():
 
 async def flush(executor: ProcessPoolExecutor, aioscheduler: AsyncIOScheduler):
     """填充历史形态记录"""
+    logger.info("启动历史形态匹配")
     interval_last_record_es = []
     handle_interval_tasks = []
     # 分周期处理
