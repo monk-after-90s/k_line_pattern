@@ -1,8 +1,8 @@
-"""使pandas的Timestamp对象可以JSON serializable到peewee model的JSONField"""
+"""使pandas的Timestamp对象可以JSON serializable到SQLAlchemy model的JSON字段类型"""
 import json
-from playhouse.mysql_ext import JSONField
 from .convert_pd_timestamp import convert_to_sh, convert_to_utc
 import pandas as pd
+from sqlalchemy import JSON, TypeDecorator
 
 
 class TimestampEncoder(json.JSONEncoder):
@@ -16,9 +16,14 @@ class TimestampEncoder(json.JSONEncoder):
         return obj.isoformat()
 
 
-class TimestampJSONField(JSONField):
-    """使pandas的Timestamp对象可以JSON serializable到peewee model的JSONField"""
+class TimestampJSONField(TypeDecorator):
+    """使pandas的Timestamp对象可以JSON serializable到SQLAlchemy model的JSON字段类型"""
+    impl = JSON
+    cache_ok = True
 
-    def db_value(self, value):
-        if value is not None:
-            return json.dumps(value, cls=TimestampEncoder)
+    def process_bind_param(self, value, dialect):
+        try:
+            json_s = json.dumps(value, cls=TimestampEncoder)
+            value = json.loads(json_s)
+        finally:
+            return value

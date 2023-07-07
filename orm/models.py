@@ -1,6 +1,6 @@
 from typing import List
-from utilities import TimestampWithTimezone, DatetimeWithTimezone
-from sqlalchemy import Column, Float, Index, JSON, String, Table, text, ForeignKey, Integer
+from utilities import TimestampWithTimezone, DatetimeWithTimezone, TimestampJSONField
+from sqlalchemy import Column, Float, Index, String, Table, text, ForeignKey, Integer
 from sqlalchemy.dialects.mysql import INTEGER, TINYINT, VARCHAR
 from sqlalchemy.orm import mapped_column, relationship, Mapped
 from sqlalchemy.orm import DeclarativeBase
@@ -72,7 +72,7 @@ class PatternRecognizeRecord(CommonColumn):
     patternEnd = mapped_column(TimestampWithTimezone, nullable=False, server_default=text('CURRENT_TIMESTAMP'),
                                comment='形态匹配的终止K线开盘时间戳')
     matchScore = mapped_column(Float, nullable=False, comment='匹配度 ')
-    extra = mapped_column(JSON, comment='匹配形态结果的其他返回值')
+    extra = mapped_column(TimestampJSONField, comment='匹配形态结果的其他返回值')
 
 
 class Dbbardata(Base):
